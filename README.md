@@ -16,7 +16,7 @@
 - [Supported Reputation Engines](#-supported-reputation-engines)
 - [Prerequisites](#-prerequisites)
 - [Installation](#-installation)
-- [Configuration](#-configurations)
+- [Configuration](#-configuration)
 - [Usage](#-usage)
 - [Output](#-output)
 - [Report Features](#-report-features)
@@ -126,7 +126,7 @@ brew install wkhtmltopdf
 
 ---
 
-## ⚙️ Configurations
+## ⚙️ Configuration
 
 ### Step 1: Configure API Keys
 
