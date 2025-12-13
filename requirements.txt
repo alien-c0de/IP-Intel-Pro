@@ -1,0 +1,19 @@
+# IP Intel Pro - Requirements
+# Python 3.8+ required
+
+# Async HTTP client for API requests
+aiohttp==3.12.15
+requests==2.32.5
+
+# Data manipulation and analysis
+pandas==2.3.2
+numpy==2.3.2
+
+# PDF generation
+pdfkit==1.0.0
+
+# Terminal colors and styling
+colorama==0.4.6
+pyfiglet=1.0.3
+# Additional async support
+asyncio==4.0.0
