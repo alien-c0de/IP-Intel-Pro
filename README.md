@@ -16,13 +16,12 @@
 - [Supported Reputation Engines](#-supported-reputation-engines)
 - [Prerequisites](#-prerequisites)
 - [Installation](#-installation)
-- [Configuration](#-configuration)
+- [Configuration](#-configurations)
 - [Usage](#-usage)
 - [Output](#-output)
 - [Report Features](#-report-features)
 - [Project Structure](#-project-structure)
 - [Troubleshooting](#-troubleshooting)
-- [Contributing](#-contributing)
 - [License](#-license)
 - [Author](#-author)
 
@@ -127,7 +126,7 @@ brew install wkhtmltopdf
 
 ---
 
-## ⚙️ Configuration
+## ⚙️ Configurations
 
 ### Step 1: Configure API Keys
 
@@ -240,8 +239,8 @@ IP Intel Pro generates three types of output files in the `output/` directory:
 
 ```
 output/
-├── Consolidated_IP_Reputation_Report_1734528564.html
-├── Consolidated_IP_Reputation_Report_1734528564.pdf
+├── IP_Intel_Report_13Dec2025_10-32-42.html
+├── IP_Intel_Report_13Dec2025_10-32-42.pdf
 └── Final_Summary_1734528564.csv
 ```
 
@@ -398,37 +397,6 @@ pip install -r requirements.txt
 
 ---
 
-## 🤝 Contributing
-
-Contributions are welcome! Here's how you can help:
-
-1. **Fork the repository**
-2. **Create a feature branch** (`git checkout -b feature/AmazingFeature`)
-3. **Commit your changes** (`git commit -m 'Add some AmazingFeature'`)
-4. **Push to the branch** (`git push origin feature/AmazingFeature`)
-5. **Open a Pull Request**
-
-### Development Guidelines
-
-- Follow PEP 8 style guidelines
-- Add docstrings to functions and classes
-- Update README.md with new features
-- Test with multiple IP addresses before submitting
-- Ensure backward compatibility
-
----
-
-## 🐛 Bug Reports
-
-Found a bug? Please open an issue with:
-- Python version
-- Operating system
-- Error message (full traceback)
-- Steps to reproduce
-- Expected vs actual behavior
-
----
-
 ## 🗺️ Roadmap
 
 Future enhancements planned:
@@ -478,9 +446,9 @@ SOFTWARE.
 
 **Alien C00de**
 
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your Profile](https://linkedin.com/in/yourprofile)
-- Email: your.email@example.com
+- GitHub: [@yourusername](https://github.com/alien-c0de)
+- LinkedIn: [Your Profile](https://linkedin.com/in/santosh-susveerkar/)
+- Email: alien.c00de@gmail.com
 
 ---
 
@@ -498,9 +466,9 @@ SOFTWARE.
 Need help? Here's how to get support:
 
 1. **Documentation**: Check this README first
-2. **Issues**: [Open an issue](https://github.com/yourusername/ip-intel-pro/issues) on GitHub
-3. **Discussions**: Join [GitHub Discussions](https://github.com/yourusername/ip-intel-pro/discussions)
-4. **Email**: Contact at your.email@example.com
+2. **Issues**: [Open an issue](https://github.com/alien-c0de/ip-intel-pro/issues) on GitHub
+3. **Discussions**: Join [GitHub Discussions](https://github.com/alien-c0de/ip-intel-pro/discussions)
+4. **Email**: Contact at alien.c00de@gmail.com
 
 ---
 
