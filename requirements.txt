@@ -1,5 +1,5 @@
 # IP Intel Pro - Requirements
-# Python 3.8+ required
+# Python 3.10+ required
 
 # Async HTTP client for API requests
 aiohttp==3.12.15

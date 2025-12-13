@@ -1,5 +1,3 @@
-import asyncio
-import datetime
 import pandas as pd
 import os
 from colorama import Fore, Style
