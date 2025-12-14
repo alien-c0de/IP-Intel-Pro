@@ -446,8 +446,8 @@ SOFTWARE.
 
 **Alien C00de**
 
-- GitHub: [@yourusername](https://github.com/alien-c0de)
-- LinkedIn: [Your Profile](https://linkedin.com/in/santosh-susveerkar/)
+- GitHub: [https://github.com/alien-c0de](https://github.com/alien-c0de)
+- LinkedIn: [https://linkedin.com/in/santosh-susveerkar](https://linkedin.com/in/santosh-susveerkar/)
 - Email: alien.c00de@gmail.com
 
 ---
