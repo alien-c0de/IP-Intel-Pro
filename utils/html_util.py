@@ -137,7 +137,6 @@ class HTML_util:
                 }}
                 
                 .section-header {{
-                    background: #5f5e5e;
                     color: white;
                     padding: 10px 20px;
                     border-radius: 0;
@@ -151,20 +150,78 @@ class HTML_util:
                 }}
                 
                 .section-header::before {{
-                    content: '🔍';
+                    content: '📊';
                     font-size: 24px;
+                }}
+                
+                /* VirusTotal - Purple/Violet */
+                .section-header.virustotal {{
+                    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+                    border-radius: 8px;
                 }}
                 
                 .section-header.virustotal::before {{
                     content: '🛡️';
                 }}
                 
+                /* MetaDefender - Teal/Cyan */
+                .section-header.metadefender {{
+                    background: linear-gradient(135deg, #14b8a6 0%, #0891b2 100%);
+                    border-radius: 8px;
+                }}
+                
                 .section-header.metadefender::before {{
                     content: '🔒';
                 }}
                 
+                /* AbuseIPDB - Orange/Amber */
+                .section-header.abuseipdb {{
+                    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                    border-radius: 8px;
+                }}
+                
                 .section-header.abuseipdb::before {{
                     content: '⚠️';
+                }}
+                
+                /* AlienVault OTX - Blue/Indigo */
+                .section-header.alienvaultotx {{
+                    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+                    border-radius: 8px;
+                }}
+                
+                .section-header.alienvaultotx::before {{
+                    content: '🔬';
+                }}
+                
+                /* GreyNoise - Green/Emerald */
+                .section-header.greynoise {{
+                    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+                    border-radius: 8px;
+                }}
+                
+                .section-header.greynoise::before {{
+                    content: '📡';
+                }}
+                
+                /* IPQualityScore - Purple/Pink */
+                .section-header.ipqualityscore {{
+                    background: linear-gradient(135deg, #a855f7 0%, #9333ea 100%);
+                    border-radius: 8px;
+                }}
+                
+                .section-header.ipqualityscore::before {{
+                    content: '🎯';
+                }}
+                
+                /* Cisco Talos - Dark Blue */
+                .section-header.ciscotalos {{
+                    background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+                    border-radius: 8px;
+                }}
+                
+                .section-header.ciscotalos::before {{
+                    content: '🔍';
                 }}
                 
                 .section-body {{
@@ -231,7 +288,7 @@ class HTML_util:
                     min-width: 100px;
                 }}
                 
-                /* Specific styling for multi-column tables (like MetaDefender) */
+                /* Specific styling for multi-column tables */
                 table thead th:not(:first-child) {{
                     width: auto;
                     min-width: 100px;
@@ -433,34 +490,32 @@ class HTML_util:
                         let html = td.innerHTML;
                         let textContent = td.textContent.toLowerCase();
                         
-                        // Check if cell contains threat keywords and apply colors
                         if (textContent.includes('malicious')) {{
-                            html = html.replace(/\bmalicious\b/gi, '<span style="color:#dc2626;font-weight:700;">MALICIOUS</span>');
+                            html = html.replace(/\\bmalicious\\b/gi, '<span style="color:#dc2626;font-weight:700;">MALICIOUS</span>');
                         }}
                         if (textContent.includes('malware')) {{
-                            html = html.replace(/\bmalware\b/gi, '<span style="color:#dc2626;font-weight:700;">MALWARE</span>');
+                            html = html.replace(/\\bmalware\\b/gi, '<span style="color:#dc2626;font-weight:700;">MALWARE</span>');
                         }}
                         if (textContent.includes('suspicious')) {{
-                            html = html.replace(/\bsuspicious\b/gi, '<span style="color:#f97316;font-weight:700;">SUSPICIOUS</span>');
+                            html = html.replace(/\\bsuspicious\\b/gi, '<span style="color:#f97316;font-weight:700;">SUSPICIOUS</span>');
                         }}
                         if (textContent.includes('undetected')) {{
-                            html = html.replace(/\bundetected\b/gi, '<span style="color:#6b7280;">UNDETECTED</span>');
+                            html = html.replace(/\\bundetected\\b/gi, '<span style="color:#6b7280;">UNDETECTED</span>');
                         }}
                         if (textContent.includes('unrated')) {{
-                            html = html.replace(/\bunrated\b/gi, '<span style="color:#6b7280;">UNRATED</span>');
+                            html = html.replace(/\\bunrated\\b/gi, '<span style="color:#6b7280;">UNRATED</span>');
                         }}
                         if (textContent.includes('harmless')) {{
-                            html = html.replace(/\bharmless\b/gi, '<span style="color:#059669;font-weight:700;">HARMLESS</span>');
+                            html = html.replace(/\\bharmless\\b/gi, '<span style="color:#059669;font-weight:700;">HARMLESS</span>');
                         }}
                         if (textContent.includes('clean')) {{
-                            html = html.replace(/\bclean\b/gi, '<span style="color:#059669;font-weight:700;">CLEAN</span>');
+                            html = html.replace(/\\bclean\\b/gi, '<span style="color:#059669;font-weight:700;">CLEAN</span>');
                         }}
                         
                         td.innerHTML = html;
                     }});
                 }}
                 
-                // Color-code Category and Result columns in VirusTotal tables
                 function colorCodeCategories() {{
                     const allTables = document.querySelectorAll('table');
                     
@@ -475,7 +530,6 @@ class HTML_util:
                             rows.forEach(row => {{
                                 const cells = row.querySelectorAll('td');
                                 
-                                // Color code Category column
                                 if (categoryIndex !== -1 && cells[categoryIndex]) {{
                                     const categoryCell = cells[categoryIndex];
                                     const categoryText = categoryCell.textContent.trim().toLowerCase();
@@ -498,7 +552,6 @@ class HTML_util:
                                     }}
                                 }}
                                 
-                                // Color code Result column
                                 if (resultIndex !== -1 && cells[resultIndex]) {{
                                     const resultCell = cells[resultIndex];
                                     const resultText = resultCell.textContent.trim().toLowerCase();
@@ -525,55 +578,54 @@ class HTML_util:
                     }});
                 }}
                 
-                // Wrap sections with proper styling
                 function wrapSections() {{
                     const tables = document.querySelectorAll('.content > table, .content > h2 + table');
                     let currentSection = null;
                     let sectionType = '';
                     
                     tables.forEach((table, index) => {{
-                        // Check if previous element is h2
                         const prevElement = table.previousElementSibling;
                         
                         if (prevElement && prevElement.tagName === 'H2') {{
-                            // Close previous section if exists
                             if (currentSection) {{
                                 table.parentNode.insertBefore(currentSection, table);
                             }}
                             
-                            // Create new section
                             const sectionTitle = prevElement.textContent.trim();
                             currentSection = document.createElement('div');
                             currentSection.className = 'section';
                             
-                            // Determine section type
                             if (sectionTitle.includes('VirusTotal')) {{
                                 sectionType = 'virustotal';
                             }} else if (sectionTitle.includes('MetaDefender')) {{
                                 sectionType = 'metadefender';
                             }} else if (sectionTitle.includes('AbuseIPDB')) {{
                                 sectionType = 'abuseipdb';
+                            }} else if (sectionTitle.includes('AlienVault')) {{
+                                sectionType = 'alienvaultotx';
+                            }} else if (sectionTitle.includes('GreyNoise')) {{
+                                sectionType = 'greynoise';
+                            }} else if (sectionTitle.includes('IPQualityScore')) {{
+                                sectionType = 'ipqualityscore';
+                            }} else if (sectionTitle.includes('Cisco Talos')) {{
+                                sectionType = 'ciscotalos';
                             }} else {{
                                 sectionType = '';
                             }}
                             
-                            // Create section header
                             const header = document.createElement('div');
                             header.className = `section-header ${{sectionType}}`;
                             header.textContent = sectionTitle;
                             
-                            // Create section body
                             const body = document.createElement('div');
                             body.className = 'section-body';
                             
                             currentSection.appendChild(header);
                             currentSection.appendChild(body);
                             
-                            // Remove the h2
                             prevElement.remove();
                         }}
                         
-                        // Add table to current section body
                         if (currentSection) {{
                             const sectionBody = currentSection.querySelector('.section-body');
                             sectionBody.appendChild(table.cloneNode(true));
@@ -581,20 +633,17 @@ class HTML_util:
                         }}
                     }});
                     
-                    // Insert last section if exists
                     if (currentSection) {{
                         document.querySelector('.content').appendChild(currentSection);
                     }}
                 }}
                 
-                // Run on page load
                 document.addEventListener('DOMContentLoaded', function() {{
                     wrapSections();
                     highlightThreats();
                     colorCodeCategories();
                 }});
                 
-                // Fallback if DOMContentLoaded already fired
                 if (document.readyState === 'complete' || document.readyState === 'interactive') {{
                     setTimeout(function() {{
                         wrapSections();
@@ -613,8 +662,6 @@ class HTML_util:
         # Generate file names
         html_report = "%s_%s.html" % (config.REPORT_FILE_NAME, timestamp.strftime("%d%b%Y_%H-%M-%S"))
         pdf_report = "%s_%s.pdf" % (config.REPORT_FILE_NAME, timestamp.strftime("%d%b%Y_%H-%M-%S"))
-        # file_name_html = '%s_%s.html' % (file_name.replace("/", "_"), timestamp)
-        # file_name_pdf = '%s_%s.pdf' % (file_name.replace("/", "_"), timestamp)
         
         html_report = os.path.join('./output', html_report)
         pdf_report = os.path.join('./output', pdf_report)
@@ -626,7 +673,6 @@ class HTML_util:
                 f.write(x)
             f.write(footer)
 
-        # filenameH = file_name_html.partition("output/")[-1]
         filenameH = os.path.basename(html_report)
         print(Fore.GREEN + Style.BRIGHT + f"\n[+] HTML Report" + Fore.WHITE + Style.BRIGHT, filenameH, Fore.GREEN + Style.BRIGHT + "is Ready", Fore.RESET)
 

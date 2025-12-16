@@ -1,130 +1,227 @@
-import asyncio
-from datetime import datetime
 import aiohttp
-import numpy as np
-import pandas as pd
+import asyncio
 from colorama import Fore, Style
-
 from utils.config_util import Configuration
-from utils.html_util import HTML_util
 
-
-class cisco_talos():
+class cisco_talos:
+    
     def __init__(self) -> None:
-        pass
-    
-    async def __link_Formating(self, ip):
-        config = Configuration()
-        url = config.TALOS_REFERER + '{}'.format(ip) 
-        return url
-    
-    async def __formating_Input(self, decodedResponse):
-        html = ""
-        output = ""
-
-        for response in decodedResponse:
-            try:
-                ipv4 = response["address"]
-                # print(Fore.CYAN + Style.BRIGHT + "[+] Processing", ipv4 + Fore.RESET)
-                output = await self.__formating_Output(response, ipv4)
-                html = html + output
-                yield html
-            except Exception as ex:
-                continue
-
-        print(Fore.CYAN + Style.BRIGHT + "[+] Finished Processing List --> Generating " + Fore.YELLOW + f"MetaDefender OPSWAT Report" + Fore.RESET)
-
-    async def __formating_Output(self, decodedResponse, target_url):
-        try:
-            dataframe = pd.DataFrame.from_dict(decodedResponse, orient='index')
-
-            dataframe.columns = [target_url]
-
-            community_score = (decodedResponse["lookup_results"]["detected_by"])
-            total_reviewers = len(decodedResponse["lookup_results"]["sources"])
-            community_score_info = str(community_score) + ("/") + str(total_reviewers) + ("  :  security vendors flagged this as malicious")
-
-            dataframe.loc['Community Score', :] = community_score_info
-            last_analysis_date =  datetime.fromisoformat(decodedResponse["lookup_results"]["start_time"][:-5])
-            dataframe.loc['Last Analysis Date', :] = last_analysis_date
-            geo_info = ""
-            if decodedResponse['geo_info']:
-                geo_info = "County : " + decodedResponse["geo_info"]["country"]["name"] + "  City : " + decodedResponse["geo_info"]["city"]["name"] + "  Location : " + str(decodedResponse["geo_info"]["location"]["latitude"]) + " , " + str(decodedResponse["geo_info"]["location"]["longitude"])
-            else:
-                geo_info = "There is no information available about the location of this IP address."
-            dataframe.loc['Geo Info', :] = geo_info 
-            
-            dataframe.sort_index(inplace=True)
-            # change column labels
-            col_labels = {'status': 'Result', 'provider': 'Source',
-                        'detect_time': 'Last Detected', 'update_time': 'Last Update'}
-
-            mt_analysis_result = pd.DataFrame(decodedResponse["lookup_results"]["sources"])
-            mt_analysis_result.rename(columns=col_labels, inplace=True)
-            
-            dataframe = dataframe.drop(['geo_info'], axis="index")
-            dataframe = dataframe.drop(['lookup_results'], axis="index")
-            dataframe = dataframe.drop(['address'], axis="index")
-            
-            html1 = dataframe.to_html(render_links=True, escape=False)
-            html2 = mt_analysis_result.to_html(render_links=True, escape=False, index=False)
-            htmlValue = html1 + html2
-        except Exception as ex:
-            error_msg = ex.args[0]
-            msg = "[-] " + "Error: " + target_url + " Reading Error, " + error_msg
-            print(Fore.RED + Style.BRIGHT + msg + Fore.RESET + Style.RESET_ALL)
-            htmlValue = msg
-        return htmlValue
-
-    async def generate_Report(self, target_url, isFile=False):
-        config = Configuration()
-        htmlTags = ""
-        tasks = []
-        decodedResponse = []
-
-        headers={
-                # 'Host': 'talosintelligence.com',
-                # 'Referer': 'https://talosintelligence.com/reputation_center/lookup?search={}'.format(ip),
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36',
-                'Accept': 'application/json'
-                }
-        try:
-            async with aiohttp.ClientSession(headers=headers) as session:
-                if isFile:
-                    ips = list(target_url)
-                else:
-                    ips = list(target_url.split(","))
-                for ip in ips:
-                    # url = await self.__link_Formating(ip)
-                    
-                    
-                    tasks.append(asyncio.create_task(session.request(method="GET",   url="https://talosintelligence.com/reputation_center/lookup?search=204.93.183.11")))
-
-                responses = await asyncio.gather(*tasks)
-                for response in responses:
-                    # load returned json from virustotal into a python dictionary called decodedResponse
-                    decodedResponse.append(await response.json())
-
-            async for val in self.__formating_Input(decodedResponse):
-                htmlTags = val
-            return htmlTags
-
-        except Exception as ex:
-            error_msg = ex.args[0]
-            msg = "[-] " + "Error: " + ip + " Reading Error, " + error_msg
-            print(Fore.RED + Style.BRIGHT + msg + Fore.RESET + Style.RESET_ALL)
-            return msg
-
-    async def cisco_talos_Report(self, target_url, isFile=False):
-        config  = Configuration()
-        if isFile:
-            iplist = []
-            with open(target_url, "r") as url_file:
-                for url in url_file.readlines():
-                    iplist.append(url.strip())
-            finalhtml = await self.generate_Report(iplist, isFile=True)
-        else:
-            finalhtml = await self.generate_Report(target_url, isFile=False)
+        self.config = Configuration()
+        self.summary_list = []
         
-        HTML_Report = HTML_util(finalhtml)
-        await HTML_Report.outputHTML(config.TALOS_REPORT_FILE_NAME, config.TALOS_REPORT_TITLE, config.TALOS_REPORT_SUB_TITLE)
+    async def get_summary_list(self):
+        return self.summary_list
+    
+    async def generate_Report(self, target_url, isFile=False):
+        try:
+            self.summary_list = []
+            ips = []
+            
+            if isFile:
+                with open(target_url, "r") as url_file:
+                    for url in url_file.readlines():
+                        ips.append(url.strip())
+            else:
+                ips = list(target_url.split(","))
+            
+            html_content = []
+            
+            for ip in ips:
+                ip = ip.strip()
+                if not ip:
+                    continue
+                    
+                print(Fore.CYAN + Style.BRIGHT + f"[*] Querying Cisco Talos Intelligence for {ip}..." + Fore.RESET)
+                
+                # Talos uses a specific query format
+                query_data = {
+                    "query_string": ip,
+                    "query_type": "ip",
+                    "offset": 0,
+                    "order": "ip"
+                }
+                
+                headers = {
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                    "Referer": f"{self.config.TALOS_REFERER}{ip}",
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+                    "Accept": "application/json, text/javascript, */*; q=0.01",
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+                
+                async with aiohttp.ClientSession() as session:
+                    try:
+                        async with session.post(
+                            self.config.TALOS_ENDPOINT_URL,
+                            data=query_data,
+                            headers=headers,
+                            timeout=aiohttp.ClientTimeout(total=30)
+                        ) as response:
+                            
+                            if response.status == 200:
+                                data = await response.json()
+                                
+                                if data and isinstance(data, dict):
+                                    html_content.append(self._format_html_report(ip, data))
+                                    
+                                    # Add to summary for CSV
+                                    reputation = self._get_reputation(data)
+                                    category = self._get_category(data)
+                                    self.summary_list.append([reputation, category])
+                                else:
+                                    html_content.append(self._format_error_html(ip, "No data returned"))
+                                    self.summary_list.append(["No Data", "N/A"])
+                            else:
+                                error_msg = f"HTTP {response.status}"
+                                html_content.append(self._format_error_html(ip, error_msg))
+                                self.summary_list.append([error_msg, "N/A"])
+                                
+                    except asyncio.TimeoutError:
+                        html_content.append(self._format_error_html(ip, "Request timeout"))
+                        self.summary_list.append(["Timeout", "N/A"])
+                    except Exception as e:
+                        error_msg = str(e)
+                        html_content.append(self._format_error_html(ip, error_msg))
+                        self.summary_list.append([f"Error: {error_msg}", "N/A"])
+            
+            return "".join(html_content)
+            
+        except Exception as ex:
+            error_msg = str(ex.args[0]) if ex.args else str(ex)
+            print(Fore.RED + Style.BRIGHT + f"[-] Cisco Talos Error: {error_msg}" + Fore.RESET)
+            return f"<p style='color: red; margin: 20px;'>Error: {error_msg}</p>"
+    
+    def _get_reputation(self, data):
+        """Extract reputation from Talos response"""
+        try:
+            if 'reputation' in data:
+                return data['reputation']
+            elif 'web_reputation' in data:
+                return data['web_reputation']
+            elif 'email_reputation' in data:
+                return data['email_reputation']
+            return "Unknown"
+        except:
+            return "Unknown"
+    
+    def _get_category(self, data):
+        """Extract category from Talos response"""
+        try:
+            if 'category' in data:
+                category = data['category']
+                if isinstance(category, dict) and 'description' in category:
+                    return category['description']
+                return str(category)
+            elif 'web_category' in data:
+                return data['web_category']
+            return "Uncategorized"
+        except:
+            return "Uncategorized"
+    
+    def _format_html_report(self, ip, data):
+        """Format the Cisco Talos data into HTML tables"""
+        
+        # Extract key information
+        reputation = self._get_reputation(data)
+        category = self._get_category(data)
+        
+        # Check for threat indicators
+        threat_score = data.get('threat_score', 'N/A')
+        blocked = data.get('blocked', False)
+        
+        # Main information table
+        main_info = f"""
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="2" style="background: #1e40af; color: white;">IP Address: {ip}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Reputation</td><td><strong>{reputation}</strong></td></tr>
+                <tr><td>Category</td><td>{category}</td></tr>
+                <tr><td>Threat Score</td><td>{threat_score}</td></tr>
+                <tr><td>Blocked Status</td><td>{'Yes' if blocked else 'No'}</td></tr>
+            </tbody>
+        </table>
+        """
+        
+        # Reputation details table
+        reputation_info = f"""
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="2" style="background: #1e40af; color: white;">Reputation Details</th>
+                </tr>
+            </thead>
+            <tbody>
+        """
+        
+        # Add email reputation if available
+        if 'email_reputation' in data:
+            reputation_info += f"<tr><td>Email Reputation</td><td>{data['email_reputation']}</td></tr>"
+        
+        # Add web reputation if available
+        if 'web_reputation' in data:
+            reputation_info += f"<tr><td>Web Reputation</td><td>{data['web_reputation']}</td></tr>"
+        
+        # Add volume info if available
+        if 'volume' in data:
+            reputation_info += f"<tr><td>Volume</td><td>{data['volume']}</td></tr>"
+        
+        # Add daychange if available
+        if 'daychange' in data:
+            reputation_info += f"<tr><td>Day Change</td><td>{data['daychange']}</td></tr>"
+        
+        # Add monthchange if available
+        if 'monthchange' in data:
+            reputation_info += f"<tr><td>Month Change</td><td>{data['monthchange']}</td></tr>"
+        
+        reputation_info += """
+            </tbody>
+        </table>
+        """
+        
+        # Network information table if available
+        network_info = ""
+        if any(key in data for key in ['asn', 'country', 'hostname', 'owner']):
+            network_info = f"""
+            <table>
+                <thead>
+                    <tr>
+                        <th colspan="2" style="background: #1e40af; color: white;">Network Information</th>
+                    </tr>
+                </thead>
+                <tbody>
+            """
+            
+            if 'hostname' in data:
+                network_info += f"<tr><td>Hostname</td><td>{data['hostname']}</td></tr>"
+            if 'asn' in data:
+                network_info += f"<tr><td>ASN</td><td>{data['asn']}</td></tr>"
+            if 'owner' in data:
+                network_info += f"<tr><td>Owner</td><td>{data['owner']}</td></tr>"
+            if 'country' in data:
+                network_info += f"<tr><td>Country</td><td>{data['country']}</td></tr>"
+            
+            network_info += """
+                </tbody>
+            </table>
+            """
+        
+        return main_info + reputation_info + network_info
+    
+    def _format_error_html(self, ip, error_msg):
+        """Format error message as HTML"""
+        return f"""
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="2" style="background: #ef4444; color: white;">Error for IP: {ip}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Error</td><td>{error_msg}</td></tr>
+            </tbody>
+        </table>
+        """

@@ -14,11 +14,6 @@ class abuseIPDB():
     def __init__(self) -> None:
         self.abs_lst = []  # Reset list for each instance
     
-    async def __link_Formating(self, ip):
-        config = Configuration()
-        url = config.ABUSEIPDB_ENDPOINT_URL + ip
-        return url
-    
     async def __formating_Input(self, decodedResponse):
         html = ""
         output = ""
@@ -26,7 +21,6 @@ class abuseIPDB():
         for response in decodedResponse:
             try:
                 ipv4 = response['data']['ipAddress']
-                # print(Fore.CYAN + Style.BRIGHT + "[+] Processing", ipv4 + Fore.RESET)
                 output = await self.__formating_Output(response, ipv4)
                 html = html + output
                 yield html
@@ -42,29 +36,59 @@ class abuseIPDB():
         print(Fore.CYAN + Style.BRIGHT + f"[+] Finished Processing AbuseIPDB" + Fore.RESET)
 
     async def __formating_Output(self, decodedResponse, target_url):
-
         try:
-            dataframe = pd.DataFrame.from_dict(decodedResponse["data"], orient='index')
-            dataframe.columns = [target_url]
-
-            # change column labels
-            row_labels = {'ipAddress': 'IP Address', 'isPublic': 'Is Public', 'ipVersion': 'IP Version', 
-                          'isWhitelisted': 'Is Whitelisted', 'abuseConfidenceScore': 'Abuse Confidence Score', 
-                          'countryCode': 'Country Code', 'usageType': 'Usage Type', 'isp': 'ISP', 'domain': 'Domain', 
-                          'hostnames': 'Hostnames', 'isTor': 'Is Tor', 'totalReports':'Total Reports', 
-                          'numDistinctUsers':'Number of Distinct Users', 'lastReportedAt':'Last Reported At'}
-
-            self.abs_lst.append([decodedResponse["data"]["abuseConfidenceScore"]])
+            data = decodedResponse["data"]
             
-            dataframe.rename(index=row_labels, inplace=True)
-            html1 = dataframe.to_html(render_links=True, escape=False)
-            htmlValue = html1 
+            # Build HTML table manually for better styling
+            html = f"""
+            <table>
+                <thead>
+                    <tr>
+                        <th colspan="2" style="background: #f59e0b; color: white;">IP Address: {target_url}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Is Public</td><td>{data.get('isPublic', 'N/A')}</td></tr>
+                    <tr><td>IP Version</td><td>{data.get('ipVersion', 'N/A')}</td></tr>
+                    <tr><td>Is Whitelisted</td><td>{data.get('isWhitelisted', 'N/A')}</td></tr>
+                    <tr><td>Abuse Confidence Score</td><td><strong>{data.get('abuseConfidenceScore', 'N/A')}</strong></td></tr>
+                    <tr><td>Country Code</td><td>{data.get('countryCode', 'N/A')}</td></tr>
+                    <tr><td>Usage Type</td><td>{data.get('usageType', 'N/A')}</td></tr>
+                    <tr><td>ISP</td><td>{data.get('isp', 'N/A')}</td></tr>
+                    <tr><td>Domain</td><td>{data.get('domain', 'N/A')}</td></tr>
+                    <tr><td>Hostnames</td><td>{', '.join(data.get('hostnames', [])) if data.get('hostnames') else 'N/A'}</td></tr>
+                    <tr><td>Is Tor</td><td>{data.get('isTor', 'N/A')}</td></tr>
+                    <tr><td>Total Reports</td><td>{data.get('totalReports', 'N/A')}</td></tr>
+                    <tr><td>Number of Distinct Users</td><td>{data.get('numDistinctUsers', 'N/A')}</td></tr>
+                    <tr><td>Last Reported At</td><td>{data.get('lastReportedAt', 'N/A')}</td></tr>
+                </tbody>
+            </table>
+            """
+            
+            # Store score for CSV
+            self.abs_lst.append([data.get("abuseConfidenceScore", "N/A")])
+            
+            return html
+            
         except Exception as ex:
-            error_msg = ex.args[0]
+            error_msg = str(ex.args[0]) if ex.args else str(ex)
             msg = "[-] " + "AbuseIpDB Engine Error: " + target_url + " Formating Output Error, " + error_msg
             print(Fore.RED + Style.BRIGHT + msg + Fore.RESET + Style.RESET_ALL)
-            htmlValue = msg
-        return htmlValue
+            
+            # Return error as HTML table
+            error_html = f"""
+            <table>
+                <thead>
+                    <tr>
+                        <th colspan="2" style="background: #ef4444; color: white;">Error for IP: {target_url}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Error</td><td>{error_msg}</td></tr>
+                </tbody>
+            </table>
+            """
+            return error_html
 
     async def generate_Report(self, target_url, isFile=False):
         config = Configuration()
@@ -85,6 +109,7 @@ class abuseIPDB():
                             ips.append(url.strip())
                 else:
                     ips = list(target_url.split(","))
+                    
                 for ip in ips:
                     url = config.ABUSEIPDB_ENDPOINT_URL
                     querystring = {'ipAddress': ip,
@@ -94,7 +119,6 @@ class abuseIPDB():
 
                 responses = await asyncio.gather(*tasks)
                 for response in responses:
-                    # load returned json from virustotal into a python dictionary called decodedResponse
                     decodedResponse.append(await response.json())
 
             async for val in self.__formating_Input(decodedResponse):
@@ -102,31 +126,11 @@ class abuseIPDB():
             return htmlTags
 
         except Exception as ex:
-            error_msg = ex.args[0]
-            msg = "[-] " + "AbuseIpDB Error: " + ip + " Generate Report Error, " + error_msg
+            error_msg = str(ex.args[0]) if ex.args else str(ex)
+            msg = "[-] " + "AbuseIpDB Error: Generate Report Error, " + error_msg
             print(Fore.RED + Style.BRIGHT + msg + Fore.RESET + Style.RESET_ALL)
             return msg
 
-    async def abuseipDB_Report(self, timestamp, target_url, isFile=False):
-        config = Configuration()
-        if isFile:
-            iplist = []
-            with open(target_url, "r") as url_file:
-                for url in url_file.readlines():
-                    iplist.append(url.strip())
-            finalhtml = await self.generate_Report(iplist, isFile=True)
-        else:
-            finalhtml = await self.generate_Report(target_url, isFile=False)
-        
-        summary_lst = await self.__formating_list()
-
-        HTML_Report = HTML_util(finalhtml)
-        await HTML_Report.outputHTML(timestamp)
-        return summary_lst
-
-    async def __formating_list(self):
-        return self.abs_lst
-    
     async def get_summary_list(self):
         """Public method to get summary list"""
         return self.abs_lst

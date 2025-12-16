@@ -63,11 +63,10 @@ class virus_total():
         try:
             config = Configuration()
             
-            # Safely access nested data with defaults
             attributes = decodedResponse.get("data", {}).get("attributes", {})
             
             if not attributes:
-                return f"<p style='color:orange;'>No data available for {target_url}</p>"
+                return self._format_error_html(target_url, "No data available")
             
             epoch_time = attributes.get("last_analysis_date", int(time.time()))
             time_formatted = time.strftime('%c', time.localtime(epoch_time))
@@ -76,23 +75,7 @@ class virus_total():
             sha_signature = await self.__encrypt_string(UrlId_unEncrypted)
             vt_urlReportLink = (config.VIRUS_TOTAL_REPORT_LINK + sha_signature)
             
-            # Create a clean copy for the dataframe - only include serializable fields
-            filteredResponse = {}
-            
-            # Safely extract only the fields we want
-            safe_fields = ['reputation', 'times_submitted', 'last_final_url', 'crowdsourced_context']
-            for field in safe_fields:
-                if field in attributes:
-                    value = attributes[field]
-                    # Convert non-serializable types to strings
-                    if isinstance(value, (dict, list)):
-                        filteredResponse[field] = str(value)
-                    elif isinstance(value, (str, int, float, bool)) or value is None:
-                        filteredResponse[field] = value
-                    else:
-                        filteredResponse[field] = str(value)
-            
-            # Get last_analysis_stats safely
+            # Get last_analysis_stats
             last_analysis_stats = attributes.get("last_analysis_stats", {})
             if isinstance(last_analysis_stats, dict):
                 malicious = int(last_analysis_stats.get("malicious", 0))
@@ -100,70 +83,108 @@ class virus_total():
                 suspicious = int(last_analysis_stats.get("suspicious", 0))
                 undetected = int(last_analysis_stats.get("undetected", 0))
                 timeout = int(last_analysis_stats.get("timeout", 0))
-                
-                # Add stats as string for display
-                filteredResponse['last_analysis_stats'] = str(last_analysis_stats)
             else:
-                malicious = 0
-                harmless = 0
-                suspicious = 0
-                undetected = 0
-                timeout = 0
+                malicious = harmless = suspicious = undetected = timeout = 0
             
             self.vt_lst.append([malicious])
             
-            # Create dataframe only if we have data
-            if filteredResponse:
-                dataframe = pd.DataFrame.from_dict(filteredResponse, orient='index')
-                dataframe.columns = [target_url]
-            else:
-                # Create empty dataframe with IP column
-                dataframe = pd.DataFrame(columns=[target_url])
-            
-            community_score = malicious
             total_vt_reviewers = harmless + malicious + suspicious + undetected + timeout
-
-            community_score_info = f"{community_score}/{total_vt_reviewers} security vendors flagged this as malicious"
             
-            dataframe.loc['Community Score', :] = community_score_info
-            dataframe.loc['Last Analysis Date', :] = time_formatted
-            dataframe.loc['VirusTotal Report Link', :] = vt_urlReportLink
-            
-            row_labels = {
-                'last_analysis_stats': 'Last Analysis Stats', 
-                'reputation': 'Reputation', 
-                'times_submitted': 'Times Submitted', 
-                'last_final_url': 'Last Final URL',
-                'crowdsourced_context': 'Crowdsourced Context'
-            }
-            dataframe.rename(index=row_labels, inplace=True)
-            dataframe.sort_index(inplace=True)
+            # Build main summary table with VirusTotal purple header
+            html_main = f"""
+            <table>
+                <thead>
+                    <tr>
+                        <th colspan="2" style="background: #8b5cf6; color: white;">IP Address: {target_url}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Community Score</td><td><strong>{malicious}/{total_vt_reviewers}</strong> security vendors flagged this as malicious</td></tr>
+                    <tr><td>Last Analysis Date</td><td>{time_formatted}</td></tr>
+                    <tr><td>Reputation</td><td>{attributes.get('reputation', 'N/A')}</td></tr>
+                    <tr><td>Times Submitted</td><td>{attributes.get('times_submitted', 'N/A')}</td></tr>
+                    <tr><td>Last Final URL</td><td>{attributes.get('last_final_url', 'N/A')}</td></tr>
+                    <tr><td>Last Analysis Stats</td><td>Malicious: {malicious}, Suspicious: {suspicious}, Harmless: {harmless}, Undetected: {undetected}</td></tr>
+                    <tr><td>VirusTotal Report</td><td><a href="{vt_urlReportLink}" target="_blank">View Full Report</a></td></tr>
+                </tbody>
+            </table>
+            """
             
             # Get analysis results
             lastAnalysisResponse = attributes.get("last_analysis_results", {})
             
-            col_labels = {'category': 'Category', 'result': 'Result', 'method': 'Method', 'engine_name': 'Engine Name'}
-            
+            html_analysis = ""
             if lastAnalysisResponse and isinstance(lastAnalysisResponse, dict):
                 try:
-                    vt_analysis_result = pd.DataFrame.from_dict(lastAnalysisResponse, orient="index")
-                    vt_analysis_result = vt_analysis_result.sort_values(by=['category'], ascending=False)
-                    vt_analysis_result.rename(columns=col_labels, inplace=True)
-                    html2 = vt_analysis_result.to_html(render_links=True, escape=False)
+                    # Build analysis results table
+                    results = []
+                    for engine, result in lastAnalysisResponse.items():
+                        if isinstance(result, dict):
+                            results.append({
+                                'Engine Name': engine,
+                                'Category': result.get('category', 'N/A'),
+                                'Result': result.get('result', 'N/A'),
+                                'Method': result.get('method', 'N/A')
+                            })
+                    
+                    if results:
+                        # Sort by category (malicious first)
+                        results_sorted = sorted(results, key=lambda x: (
+                            0 if x['Category'] == 'malicious' else
+                            1 if x['Category'] == 'suspicious' else
+                            2 if x['Category'] == 'undetected' else 3
+                        ))
+                        
+                        html_analysis = """
+                        <table style="margin-top: 15px;">
+                            <thead>
+                                <tr>
+                                    <th>Engine Name</th>
+                                    <th>Category</th>
+                                    <th>Result</th>
+                                    <th>Method</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                        """
+                        
+                        for result in results_sorted:
+                            html_analysis += f"""
+                            <tr>
+                                <td>{result['Engine Name']}</td>
+                                <td>{result['Category']}</td>
+                                <td>{result['Result']}</td>
+                                <td>{result['Method']}</td>
+                            </tr>
+                            """
+                        
+                        html_analysis += "</tbody></table>"
+                        
                 except Exception as e:
-                    html2 = f"<p>Analysis results available but could not be formatted: {str(e)}</p>"
-            else:
-                html2 = "<p>No detailed analysis results available.</p>"
-
-            html1 = dataframe.to_html(render_links=True, escape=False)
-            htmlValue = html1 + html2
+                    html_analysis = f"<p style='margin: 10px 0;'>Analysis results available but could not be formatted: {str(e)}</p>"
+            
+            return html_main + html_analysis
             
         except Exception as ex:
             error_msg = str(ex.args[0]) if ex.args else str(ex)
             msg = "[-] " + "VirusTotal Engine Error: " + target_url + " Formatting Output Error, " + error_msg
             print(Fore.RED + Style.BRIGHT + msg + Fore.RESET + Style.RESET_ALL)
-            htmlValue = f"<p style='color:red;'>Error processing {target_url}: {error_msg}</p>"
-        return htmlValue
+            return self._format_error_html(target_url, error_msg)
+
+    def _format_error_html(self, ip, error_msg):
+        """Format error message as HTML"""
+        return f"""
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="2" style="background: #ef4444; color: white;">Error for IP: {ip}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Error</td><td>{error_msg}</td></tr>
+            </tbody>
+        </table>
+        """
 
     async def generate_Report(self, target_url, isFile=False):
         config = Configuration()
@@ -183,7 +204,6 @@ class virus_total():
                     with open(target_url, "r") as url_file:
                         for url in url_file.readlines():
                             ips.append(url.strip())
-                            # ips = list(target_url)
                 else:
                     ips = list(target_url.split(","))
                     
@@ -212,22 +232,6 @@ class virus_total():
             print(Fore.RED + Style.BRIGHT + msg + Fore.RESET + Style.RESET_ALL)
             return f"<p style='color:red;'>Error generating report: {error_msg}</p>"
 
-    async def virus_total_Report(self, timestamp, target_url, isFile=False):
-        config = Configuration()
-        if isFile:
-            iplist = []
-            with open(target_url, "r") as url_file:
-                for url in url_file.readlines():
-                    iplist.append(url.strip())
-            finalhtml = await self.generate_Report(iplist, isFile=True)
-        else:
-            finalhtml = await self.generate_Report(target_url, isFile=False)
-
-        summary_lst = self.vt_lst
-        HTML_Report = HTML_util(finalhtml)
-        await HTML_Report.outputHTML(config.VIRUS_TOTAL_REPORT_FILE_NAME, timestamp)
-        return summary_lst
-    
     async def get_summary_list(self):
         """Public method to get summary list"""
         return self.vt_lst

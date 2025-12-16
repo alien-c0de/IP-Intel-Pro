@@ -124,28 +124,6 @@ class meta_defender():
             print(Fore.RED + Style.BRIGHT + msg + Fore.RESET + Style.RESET_ALL)
             return msg
 
-    async def meta_defender_Report(self, timestamp, target_url, isFile=False):
-        config = Configuration()
-        if isFile:
-            iplist = []
-            with open(target_url, "r") as url_file:
-                for url in url_file.readlines():
-                    iplist.append(url.strip())
-            finalhtml = await self.generate_Report(iplist, isFile=True)
-        else:
-            finalhtml = await self.generate_Report(target_url, isFile=False)
-        
-        summary_lst = await self.__formating_list()
-
-        HTML_Report = HTML_util(finalhtml)
-        await HTML_Report.outputHTML(timestamp)
-
-        return summary_lst
-
-    
-    async def __formating_list(self):
-        return self.meta_lst
-    
     async def get_summary_list(self):
         """Public method to get summary list"""
         return self.meta_lst
