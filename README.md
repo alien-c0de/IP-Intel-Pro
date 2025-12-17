@@ -2,7 +2,7 @@
 
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/yourusername/ip-intel-pro/graphs/commit-activity)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/alien-c0de/ip-intel-pro/graphs/commit-activity)
 
 **IP Intel Pro** is a comprehensive IP reputation analysis tool that aggregates threat intelligence data from multiple trusted sources to provide detailed security assessments of IP addresses. Perfect for security analysts, network administrators, and cybersecurity professionals who need quick, reliable IP reputation checks.
 
@@ -17,19 +17,23 @@
 - [Prerequisites](#-prerequisites)
 - [Screenshots](#-screenshots)
 - [Installation](#-installation)
-- [Configuration](#-configuration)
+- [Configuration](#%EF%B8%8F-configuration)
 - [Usage](#-usage)
 - [Output](#-output)
 - [Report Features](#-report-features)
 - [Troubleshooting](#-troubleshooting)
+- [Roadmap](#%EF%B8%8F-roadmap)
 - [License](#-license)
 - [Author](#-author)
+- [Acknowledgments](#-acknowledgments)
+- [Support](#-support)
+- [Star History](#-star-history)
 
 ---
 
 ## ✨ Features
 
-- 🔍 **Multi-Source Intelligence**: Queries three leading threat intelligence platforms simultaneously
+- 🔍 **Multi-Source Intelligence**: Queries seven leading threat intelligence platforms simultaneously
 - 📊 **Consolidated Reporting**: Single comprehensive report combining all sources
 - 🎨 **Professional Reports**: Generates HTML and PDF reports with modern, clean design
 - 📈 **CSV Export**: Exports summary data in CSV format for further analysis
@@ -50,12 +54,10 @@ IP Intel Pro integrates with the following threat intelligence platforms:
 | **VirusTotal** | [virustotal.com](https://www.virustotal.com) | Comprehensive threat detection using 90+ security vendors |
 | **MetaDefender** | [metadefender.opswat.com](https://metadefender.opswat.com) | Multi-scanning with geo-location intelligence |
 | **AbuseIPDB** | [abuseipdb.com](https://www.abuseipdb.com) | Community-driven IP abuse reporting database |
-| **AbuseIPDB** | [abuseipdb.com](https://www.abuseipdb.com) | Community-driven IP abuse reporting database |
-| **IPQualityScore** | [ipqualityscore.com](https://www.ipqualityscore.com) | Enterprise-grade fraud protection and IP risk scoring |
-| **GreyNoise** | [greynoise.io](https://www.greynoise.io) | Internet background noise analysis and scanner detection |
-| **CriminalIP** | [criminalip.io](https://www.criminalip.io) | AI-based Cyber Threat Intelligence (CTI) search engine |
 | **AlienVault OTX** | [otx.alienvault.com](https://otx.alienvault.com) | The world's largest open threat intelligence community |
-
+| **GreyNoise** | [greynoise.io](https://www.greynoise.io) | Internet background noise analysis and scanner detection |
+| **IPQualityScore** | [ipqualityscore.com](https://www.ipqualityscore.com) | Enterprise-grade fraud protection and IP risk scoring |
+| **Cisco Talos** | [talosintelligence.com](https://talosintelligence.com) | Cisco's threat intelligence and research platform |
 
 ---
 
@@ -76,10 +78,11 @@ You'll need free API keys from:
 1. **VirusTotal**: [Sign up here](https://www.virustotal.com/gui/join-us)
 2. **MetaDefender**: [Get API key](https://metadefender.opswat.com/sign-up)
 3. **AbuseIPDB**: [Register here](https://www.abuseipdb.com/register)
-4. **IPQualityScore**: [Create account](https://www.ipqualityscore.com/create-account)
+4. **AlienVault OTX**: [Register here](https://otx.alienvault.com/sign-up)
 5. **GreyNoise**: [Get Community API](https://viz.greynoise.io/signup)
-6. **CriminalIP**: [Sign up here](https://www.criminalip.io/register)
-7. **AlienVault OTX**: [Register here](https://otx.alienvault.com/sign-up)
+6. **IPQualityScore**: [Create account](https://www.ipqualityscore.com/create-account)
+
+**Note**: Cisco Talos does not require an API key.
 
 ---
 
@@ -93,7 +96,7 @@ You'll need free API keys from:
 ### HTML Report
 ![Ip Report](https://github.com/user-attachments/assets/62bd8bc8-b1ed-451a-b9b0-780e1bfc74f7)
 
-*Professional report*
+*Professional report with color-coded threat levels*
 
 ---
 
@@ -102,7 +105,7 @@ You'll need free API keys from:
 ### Step 1: Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/ip-intel-pro.git
+git clone https://github.com/alien-c0de/ip-intel-pro.git
 cd ip-intel-pro
 ```
 
@@ -152,35 +155,42 @@ brew install wkhtmltopdf
 Edit the `config/config.ini` file with your API keys:
 
 ```ini
+[General]
+AUTHOR = Alien C00de
+YEAR = 2025
+VERSION = 1.3.0
+COMPANY_NAME = Alien Security
+TOOL_NAME = IP Intel Pro
+EMAIL = alien.c00de@gmail.com
 
 [VirusTotal]
-API_KEY = Your_API_Key
+API_KEY = Your_VirusTotal_API_Key
 ENDPOINT_URL = https://www.virustotal.com/api/v3/urls/
 REPORT_LINK = https://www.virustotal.com/gui/url/
 
 [MetaDefender]
-API_KEY = Your_API_Key
+API_KEY = Your_MetaDefender_API_Key
 ENDPOINT_URL = https://api.metadefender.com/v4/ip/
 
 [AbuseIPDB]
-API_KEY = Your_API_Key
+API_KEY = Your_AbuseIPDB_API_Key
 ENDPOINT_URL = https://api.abuseipdb.com/api/v2/check
 
 [AlienVault_OTX]
-API_KEY = Your_API_Key
+API_KEY = Your_AlienVault_API_Key
 ENDPOINT_URL = https://otx.alienvault.com/api/v1/indicators/IPv4/
 
 [GreyNoise]
-API_KEY = Your_API_Key
+API_KEY = Your_GreyNoise_API_Key
 ENDPOINT_URL = https://api.greynoise.io/v3/community/
 
 [IPQualityScore]
-API_KEY = Your_API_Key
+API_KEY = Your_IPQualityScore_API_Key
 ENDPOINT_URL = https://ipqualityscore.com/api/json/ip/
 
-[CriminalIP]
-API_KEY = Your_API_Key
-ENDPOINT_URL = https://api.criminalip.io/v1/asset/ip/report?ip=
+[CISCO_Talos]
+ENDPOINT_URL = https://talosintelligence.com/sb_api/query_lookup
+REFERER = https://talosintelligence.com/reputation_center/lookup?search=
 ```
 
 ### Step 2: Customize Company Branding (Optional)
@@ -227,10 +237,10 @@ usage: main.py [-h] [-s SINGLE_ENTRY] [-i IP_LIST] [-V]
 IP Intel Pro: Comprehensive IP Reputation Analysis
 
 optional arguments:
-  -h, --help               Show this help message and exit
-  -s SINGLE_ENTRY,         Single IP address for analysis
-  -i IP_LIST, --ip-list    IP_LIST File containing list of IP addresses (one per line)
-  -V, --version            Show program version
+  -h, --help            Show this help message and exit
+  -s SINGLE_ENTRY       Single IP address for analysis
+  -i IP_LIST            File containing list of IP addresses (one per line)
+  -V, --version         Show program version
 ```
 
 ---
@@ -240,27 +250,35 @@ optional arguments:
 IP Intel Pro generates three types of output files in the `output/` directory:
 
 ### 1. Consolidated HTML Report
-- **Filename**: `Consolidated_IP_Reputation_Report_[timestamp].html`
-- **Contains**: Complete analysis from all three engines in a single file
+- **Filename**: `IP_Intel_Report_[timestamp].html`
+- **Contains**: Complete analysis from all seven engines in a single file
 - **Features**: Color-coded threat levels, professional design, responsive layout
 
 ### 2. PDF Report
-- **Filename**: `Consolidated_IP_Reputation_Report_[timestamp].pdf`
+- **Filename**: `IP_Intel_Report_[timestamp].pdf`
 - **Contains**: Same content as HTML but in PDF format for easy sharing
 - **Features**: Print-ready, professional formatting
 
 ### 3. CSV Summary
 - **Filename**: `Final_Summary_[timestamp].csv`
 - **Contains**: Tabular data with scores from all engines
-- **Columns**: IP Address, VirusTotal Score, AbuseIPDB Score, MetaDefender Score, Geo Info
+- **Columns**: 
+  - IP Address
+  - VirusTotal Malicious Score
+  - AbuseIPDB Confidence Score
+  - MetaDefender Score & Geo Info
+  - AlienVault Reputation Score
+  - GreyNoise Classification & Service Name
+  - IPQualityScore Fraud Score & ISP
+  - Cisco Talos Reputation & Category
 
 ### Example Output Structure
 
 ```
 output/
-├── IP_Intel_Report_13Dec2025_10-32-42.html
-├── IP_Intel_Report_13Dec2025_10-32-42.pdf
-└── Final_Summary_1734528564.csv
+├── IP_Intel_Report_17Dec2025_14-32-42.html
+├── IP_Intel_Report_17Dec2025_14-32-42.pdf
+└── Final_Summary_17Dec2025_14-32-42.csv
 ```
 
 ---
@@ -291,27 +309,27 @@ Each consolidated report includes:
 4. **MetaDefender Analysis**:
    - Multi-engine scanning results
    - Geo-location information
-   - Sandbox analysis (if available)
+   - Security vendor detections
 5. **AbuseIPDB Analysis**:
    - Abuse confidence score
    - ISP and hosting information
    - Report history and statistics
-6. **IPQualityScore Analysis**:
-   - Fraud score and risk rating
-   - VPN, Proxy, and Tor node detection
-   - Bot status and connection type
+6. **AlienVault OTX Analysis**:
+   - Reputation score and risk level
+   - Threat pulses and community intelligence
+   - Geographic and network information
 7. **GreyNoise Analysis**:
    - Noise classification (Internet background noise)
    - RIOT (Common Business Service) verification
-   - Actor and tag identification
-8. **CriminalIP Analysis**:
-   - Inbound and Outbound risk scores
-   - Associated vulnerabilities (CVEs)
-   - Domain and certificate reputation
-9. **AlienVault OTX Analysis**:
-   - Pulse count and community subscribers
-   - Related malware families and tags
-   - Linked indicators of compromise
+   - Service name and activity classification
+8. **IPQualityScore Analysis**:
+   - Fraud score and risk rating
+   - VPN, Proxy, and Tor node detection
+   - Bot status and connection type
+9. **Cisco Talos Intelligence Analysis**:
+   - Reputation score and category
+   - Threat intelligence and email reputation
+   - Network ownership information
 10. **Footer**: Tool version and developer information
 
 ---
@@ -366,21 +384,34 @@ Each consolidated report includes:
 pip install -r requirements.txt --upgrade
 ```
 
+#### 6. Mixed Error and Success Results in CSV
+
+**Issue:** Some IPs show errors while others succeed, but CSV doesn't include all results
+
+**Solution:**
+- Updated CSV utility now handles mixed results properly
+- All IPs will appear in the CSV with either data or error messages
+- Check the CSV file - it should contain all scanned IPs
+
 ---
 
 ## 🗺️ Roadmap
 
 Future enhancements planned:
 
-- [ ] Additional reputation engines 
+- [ ] Additional reputation engines (Shodan, Censys)
 - [ ] Web interface for easier access
 - [ ] Scheduled scanning jobs
+- [ ] REST API for integration
+- [ ] Docker containerization
+- [ ] Real-time threat feed integration
+- [ ] Historical data tracking and trending
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
@@ -388,22 +419,26 @@ This project is licensed under the MIT License.
 
 **Alien C00de**
 
-- GitHub: [https://github.com/alien-c0de](https://github.com/alien-c0de)
-- LinkedIn: [https://linkedin.com/in/santosh-susveerkar](https://linkedin.com/in/santosh-susveerkar/)
+- GitHub: [@alien-c0de](https://github.com/alien-c0de)
+- LinkedIn: [santosh-susveerkar](https://linkedin.com/in/santosh-susveerkar/)
 - Email: alien.c00de@gmail.com
+- Website: [Coming Soon]
 
 ---
 
 ## 🙏 Acknowledgments
 
-- [VirusTotal](https://www.virustotal.com) 
-- [MetaDefender](https://metadefender.opswat.com) 
-- [AbuseIPDB](https://www.abuseipdb.com) 
-- [IPQualityScore](https://www.ipqualityscore.com/create-account)
-- [GreyNoise](https://viz.greynoise.io/signup)
-- [CriminalIP](https://www.criminalip.io/register)
-- [AlienVault OTX](https://otx.alienvault.com/sign-up)
-- All contributors and users of IP Intel Pro
+Special thanks to the following threat intelligence platforms for providing APIs:
+
+- [VirusTotal](https://www.virustotal.com) - For comprehensive multi-vendor malware detection
+- [MetaDefender](https://metadefender.opswat.com) - For multi-scanning capabilities
+- [AbuseIPDB](https://www.abuseipdb.com) - For community-driven abuse reporting
+- [AlienVault OTX](https://otx.alienvault.com) - For open threat intelligence
+- [GreyNoise](https://www.greynoise.io) - For internet noise analysis
+- [IPQualityScore](https://www.ipqualityscore.com) - For fraud detection and risk scoring
+- [Cisco Talos](https://talosintelligence.com) - For comprehensive threat intelligence
+
+All contributors and users of IP Intel Pro are also greatly appreciated!
 
 ---
 
@@ -422,7 +457,7 @@ Need help? Here's how to get support:
 
 If you find IP Intel Pro useful, please consider giving it a star! ⭐
 
-[![Star History Chart](https://api.star-history.com/svg?repos=yourusername/ip-intel-pro&type=Date)](https://star-history.com/#yourusername/ip-intel-pro&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=alien-c0de/ip-intel-pro&type=Date)](https://star-history.com/#alien-c0de/ip-intel-pro&Date)
 
 ---
 
@@ -430,6 +465,6 @@ If you find IP Intel Pro useful, please consider giving it a star! ⭐
 
 **Made with ❤️ for the cybersecurity community**
 
-[Report Bug](https://github.com/yourusername/ip-intel-pro/issues) · [Request Feature](https://github.com/yourusername/ip-intel-pro/issues) · [Documentation](https://github.com/yourusername/ip-intel-pro/wiki)
+[Report Bug](https://github.com/alien-c0de/ip-intel-pro/issues) · [Request Feature](https://github.com/alien-c0de/ip-intel-pro/issues) · [Documentation](https://github.com/alien-c0de/ip-intel-pro/wiki)
 
 </div>
