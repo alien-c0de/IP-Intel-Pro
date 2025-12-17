@@ -40,16 +40,39 @@ class virus_total():
                 html = html + output
                 yield html
             except Exception as ex:
+                # Handle error and display in report
                 try:
-                    code = "Error Code : " + str(response["error"]["code"])
-                    err_msg = response["error"]["message"]
-                    err = code + " " + err_msg
+                    # Try to extract IP from error response
+                    ipv4 = "Unknown IP"
+                    if "data" in response and "attributes" in response["data"]:
+                        ipv4 = await self.__find_ip_address(response["data"]["attributes"].get("url", ""))
                 except:
-                    err = str(ex)
+                    ipv4 = "Unknown IP"
                 
-                self.vt_lst.append([err])
-                msg = "[-] " + "VirusTotal Engine Error: Formatting Input Error, " + str(err)
-                print(Fore.RED + Style.BRIGHT + msg + Fore.RESET + Style.RESET_ALL)
+                try:
+                    # Extract error details
+                    code = "Error Code: " + str(response["error"]["code"])
+                    err_msg = response["error"]["message"]
+                    err = code + " - " + err_msg
+                    self.vt_lst.append([err])
+                    msg = "[-] " + "VirusTotal Engine Error: Formatting Input Error, " + err_msg
+                    print(Fore.RED + Style.BRIGHT + msg + Fore.RESET + Style.RESET_ALL)
+                    
+                    # Generate error HTML for report
+                    error_html = self._format_error_html(ipv4, err)
+                    html = html + error_html
+                    output = error_html
+                    yield html
+                except:
+                    error_msg = str(ex)
+                    self.vt_lst.append([error_msg])
+                    print(Fore.RED + Style.BRIGHT + f"[-] VirusTotal Error: {error_msg}" + Fore.RESET)
+                    
+                    # Generate error HTML for report
+                    error_html = self._format_error_html(ipv4, error_msg)
+                    html = html + error_html
+                    output = error_html
+                    yield html
                 continue
 
         print(Fore.CYAN + Style.BRIGHT + "[+] Finished Processing 🛡️ VirusTotal" + Fore.RESET)
@@ -57,6 +80,14 @@ class virus_total():
     async def __formating_Output(self, decodedResponse, target_url):
         try:
             config = Configuration()
+            
+            # Check if response contains error
+            if "error" in decodedResponse:
+                code = decodedResponse["error"].get("code", "Unknown")
+                err_msg = decodedResponse["error"].get("message", "Unknown error")
+                error_text = f"Error Code {code}: {err_msg}"
+                self.vt_lst.append([error_text])
+                return self._format_error_html(target_url, error_text)
             
             attributes = decodedResponse.get("data", {}).get("attributes", {})
             
@@ -176,7 +207,7 @@ class virus_total():
                 </tr>
             </thead>
             <tbody>
-                <tr><td>Error</td><td>{error_msg}</td></tr>
+                <tr><td>Error Details</td><td>{error_msg}</td></tr>
             </tbody>
         </table>
         """
@@ -208,14 +239,48 @@ class virus_total():
 
                 responses = await asyncio.gather(*tasks, return_exceptions=True)
                 
-                for response in responses:
+                for idx, response in enumerate(responses):
                     if isinstance(response, Exception):
-                        decodedResponse.append({"error": {"code": "connection", "message": str(response)}})
+                        # Handle connection/network errors
+                        ip = ips[idx] if idx < len(ips) else "Unknown IP"
+                        error_response = {
+                            "data": {
+                                "attributes": {
+                                    "url": f"http://{ip}/"
+                                }
+                            },
+                            "error": {
+                                "code": "connection_error",
+                                "message": str(response)
+                            }
+                        }
+                        decodedResponse.append(error_response)
                     else:
                         try:
-                            decodedResponse.append(await response.json())
+                            json_data = await response.json()
+                            # Add IP to error responses if not present
+                            if "error" in json_data and "data" not in json_data and idx < len(ips):
+                                json_data["data"] = {
+                                    "attributes": {
+                                        "url": f"http://{ips[idx]}/"
+                                    }
+                                }
+                            decodedResponse.append(json_data)
                         except Exception as e:
-                            decodedResponse.append({"error": {"code": "parse", "message": str(e)}})
+                            # Handle JSON parsing errors
+                            ip = ips[idx] if idx < len(ips) else "Unknown IP"
+                            error_response = {
+                                "data": {
+                                    "attributes": {
+                                        "url": f"http://{ip}/"
+                                    }
+                                },
+                                "error": {
+                                    "code": "parse_error",
+                                    "message": f"Failed to parse response: {str(e)}"
+                                }
+                            }
+                            decodedResponse.append(error_response)
 
             async for val in self.formating_Input(decodedResponse):
                 htmlTags = val
@@ -225,7 +290,9 @@ class virus_total():
             error_msg = str(ex.args[0]) if ex.args else str(ex)
             msg = "[-] " + "VirusTotal Error: Generate Report Error, " + error_msg
             print(Fore.RED + Style.BRIGHT + msg + Fore.RESET + Style.RESET_ALL)
-            return f"<p style='color:red;'>Error generating report: {error_msg}</p>"
+            
+            # Return error HTML instead of just error message
+            return self._format_error_html("Multiple IPs", error_msg)
 
     async def get_summary_list(self):
         """Public method to get summary list"""

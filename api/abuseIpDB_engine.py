@@ -20,19 +20,55 @@ class abuseIPDB():
                 html = html + output
                 yield html
             except Exception as ex:
-                code = "Error Code : " + str(response["errors"][0]["status"])
-                err_msg = response["errors"][0]["detail"]
-                err = code + " " + err_msg
-                self.abs_lst.append([err])
-                msg = "[-] " + "AbuseIpDB Engine Error: Formating Input Error, " + err_msg
-                print(Fore.RED + Style.BRIGHT + msg + Fore.RESET + Style.RESET_ALL)
+                # Handle error and display in report
+                try:
+                    # Try to extract IP from error response
+                    ipv4 = response.get('data', {}).get('ipAddress', 'Unknown IP')
+                except:
+                    ipv4 = "Unknown IP"
+                
+                try:
+                    # Extract error details
+                    code = "Error Code: " + str(response["errors"][0]["status"])
+                    err_msg = response["errors"][0]["detail"]
+                    err = code + " - " + err_msg
+                    self.abs_lst.append([err])
+                    msg = "[-] " + "AbuseIpDB Engine Error: Formating Input Error, " + err_msg
+                    print(Fore.RED + Style.BRIGHT + msg + Fore.RESET + Style.RESET_ALL)
+                    
+                    # Generate error HTML for report
+                    error_html = self._format_error_html(ipv4, err)
+                    html = html + error_html
+                    output = error_html
+                    yield html
+                except:
+                    error_msg = str(ex)
+                    self.abs_lst.append([error_msg])
+                    print(Fore.RED + Style.BRIGHT + f"[-] AbuseIPDB Error: {error_msg}" + Fore.RESET)
+                    
+                    # Generate error HTML for report
+                    error_html = self._format_error_html(ipv4, error_msg)
+                    html = html + error_html
+                    output = error_html
+                    yield html
                 continue
 
         print(Fore.CYAN + Style.BRIGHT + f"[+] Finished Processing ⚠️ AbuseIPDB" + Fore.RESET)
 
     async def __formating_Output(self, decodedResponse, target_url):
         try:
-            data = decodedResponse["data"]
+            # Check if response contains error
+            if "errors" in decodedResponse:
+                code = decodedResponse["errors"][0].get("status", "Unknown")
+                err_msg = decodedResponse["errors"][0].get("detail", "Unknown error")
+                error_text = f"Error Code {code}: {err_msg}"
+                self.abs_lst.append([error_text])
+                return self._format_error_html(target_url, error_text)
+            
+            data = decodedResponse.get("data", {})
+            
+            if not data:
+                return self._format_error_html(target_url, "No data available")
             
             # Build HTML table manually for better styling
             html = f"""
@@ -69,21 +105,22 @@ class abuseIPDB():
             error_msg = str(ex.args[0]) if ex.args else str(ex)
             msg = "[-] " + "AbuseIpDB Engine Error: " + target_url + " Formating Output Error, " + error_msg
             print(Fore.RED + Style.BRIGHT + msg + Fore.RESET + Style.RESET_ALL)
-            
-            # Return error as HTML table
-            error_html = f"""
-            <table>
-                <thead>
-                    <tr>
-                        <th colspan="2" style="background: #ef4444; color: white;">Error for IP: {target_url}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr><td>Error</td><td>{error_msg}</td></tr>
-                </tbody>
-            </table>
-            """
-            return error_html
+            return self._format_error_html(target_url, error_msg)
+
+    def _format_error_html(self, ip, error_msg):
+        """Format error message as HTML"""
+        return f"""
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="2" style="background: #ef4444; color: white;">Error for IP: {ip}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Error Details</td><td>{error_msg}</td></tr>
+            </tbody>
+        </table>
+        """
 
     async def generate_Report(self, target_url, isFile=False):
         config = Configuration()
@@ -112,9 +149,44 @@ class abuseIPDB():
                                   }
                     tasks.append(asyncio.create_task(session.request(method="GET", url=url, params=querystring)))
 
-                responses = await asyncio.gather(*tasks)
-                for response in responses:
-                    decodedResponse.append(await response.json())
+                responses = await asyncio.gather(*tasks, return_exceptions=True)
+                
+                for idx, response in enumerate(responses):
+                    if isinstance(response, Exception):
+                        # Handle connection/network errors
+                        ip = ips[idx] if idx < len(ips) else "Unknown IP"
+                        error_response = {
+                            "data": {
+                                "ipAddress": ip
+                            },
+                            "errors": [{
+                                "status": "connection_error",
+                                "detail": str(response)
+                            }]
+                        }
+                        decodedResponse.append(error_response)
+                    else:
+                        try:
+                            json_data = await response.json()
+                            # Add IP to error responses if not present
+                            if "errors" in json_data and "data" not in json_data and idx < len(ips):
+                                json_data["data"] = {
+                                    "ipAddress": ips[idx]
+                                }
+                            decodedResponse.append(json_data)
+                        except Exception as e:
+                            # Handle JSON parsing errors
+                            ip = ips[idx] if idx < len(ips) else "Unknown IP"
+                            error_response = {
+                                "data": {
+                                    "ipAddress": ip
+                                },
+                                "errors": [{
+                                    "status": "parse_error",
+                                    "detail": f"Failed to parse response: {str(e)}"
+                                }]
+                            }
+                            decodedResponse.append(error_response)
 
             async for val in self.__formating_Input(decodedResponse):
                 htmlTags = val
@@ -124,7 +196,9 @@ class abuseIPDB():
             error_msg = str(ex.args[0]) if ex.args else str(ex)
             msg = "[-] " + "AbuseIpDB Error: Generate Report Error, " + error_msg
             print(Fore.RED + Style.BRIGHT + msg + Fore.RESET + Style.RESET_ALL)
-            return msg
+            
+            # Return error HTML instead of just error message
+            return self._format_error_html("Multiple IPs", error_msg)
 
     async def get_summary_list(self):
         """Public method to get summary list"""
