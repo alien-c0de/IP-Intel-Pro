@@ -1,10 +1,7 @@
 import asyncio
 import aiohttp
-import pandas as pd
 from colorama import Fore, Style
 from utils.config_util import Configuration
-from utils.html_util import HTML_util
-
 
 class alienvault_otx():
     def __init__(self):
@@ -16,7 +13,6 @@ class alienvault_otx():
         for response in decodedResponse:
             try:
                 ipv4 = response.get('indicator', 'Unknown IP')
-                # print(Fore.CYAN + Style.BRIGHT + "[+] Processing", ipv4 + Fore.RESET)
                 output = await self.__formating_Output(response, ipv4)
                 html = html + output
                 yield html
@@ -27,10 +23,16 @@ class alienvault_otx():
                 print(Fore.RED + Style.BRIGHT + msg + Fore.RESET + Style.RESET_ALL)
                 continue
 
-        print(Fore.CYAN + Style.BRIGHT + "[+] Finished Processing AlienVault OTX" + Fore.RESET)
+        print(Fore.CYAN + Style.BRIGHT + "[+] Finished Processing 🔬 AlienVault OTX" + Fore.RESET)
 
     async def __formating_Output(self, decodedResponse, target_url):
         try:
+            # Check for error in response
+            if 'error' in decodedResponse:
+                error_msg = decodedResponse.get('error', {}).get('message', 'Unknown error')
+                self.otx_lst.append([f"Error: {error_msg}"])
+                return self._format_error_html(target_url, error_msg)
+            
             # Extract key information
             general_info = decodedResponse.get('general', {})
             reputation = decodedResponse.get('reputation', {})
@@ -39,85 +41,104 @@ class alienvault_otx():
             url_list = decodedResponse.get('url_list', {})
             passive_dns = decodedResponse.get('passive_dns', {})
             
-            # Create main summary dataframe
-            summary_data = {}
-            
             # Reputation and threat data
             reputation_score = reputation.get('threat_score', 0) if reputation else 0
-            reputation_counts = reputation.get('counts', {}) if reputation else {}
-            
-            summary_data['Reputation Score'] = f"{reputation_score}/7"
-            summary_data['Reputation Level'] = self.__get_reputation_level(reputation_score)
-            
-            # Pulse information
             pulse_count = general_info.get('pulse_info', {}).get('count', 0)
-            summary_data['Threat Pulses'] = pulse_count
             
             # Store for CSV
             self.otx_lst.append([reputation_score])
             
             # Geographic information
+            country = "Unknown"
+            city = "Unknown"
+            continent = "Unknown"
+            latitude = "N/A"
+            longitude = "N/A"
+            
             if geo_data:
                 country = geo_data.get('country_name', 'Unknown')
                 city = geo_data.get('city', 'Unknown')
-                summary_data['Country'] = country
-                summary_data['City'] = city
-                summary_data['Continent'] = geo_data.get('continent_code', 'Unknown')
-                summary_data['Latitude'] = geo_data.get('latitude', 'N/A')
-                summary_data['Longitude'] = geo_data.get('longitude', 'N/A')
+                continent = geo_data.get('continent_code', 'Unknown')
+                latitude = geo_data.get('latitude', 'N/A')
+                longitude = geo_data.get('longitude', 'N/A')
             
-            # ASN Information
-            summary_data['ASN'] = general_info.get('asn', 'Unknown')
+            # ASN information
+            asn = general_info.get('asn', 'Unknown')
             
-            # Malware samples
-            if malware_data:
-                malware_count = malware_data.get('count', 0)
-                summary_data['Malware Samples'] = malware_count
+            # Malware, URLs, DNS counts
+            malware_count = malware_data.get('count', 0) if malware_data else 0
+            url_count = url_list.get('url_count', 0) if url_list else 0
+            dns_count = passive_dns.get('count', 0) if passive_dns else 0
             
-            # URLs associated
-            if url_list:
-                url_count = url_list.get('url_count', 0)
-                summary_data['Associated URLs'] = url_count
-            
-            # Passive DNS
-            if passive_dns:
-                dns_count = passive_dns.get('count', 0)
-                summary_data['Passive DNS Records'] = dns_count
-            
-            # Create summary dataframe
-            dataframe = pd.DataFrame.from_dict(summary_data, orient='index')
-            dataframe.columns = [target_url]
-            dataframe.sort_index(inplace=True)
-            
-            html1 = dataframe.to_html(render_links=True, escape=False)
+            # Build main summary table with AlienVault blue header
+            html_main = f"""
+            <table>
+                <thead>
+                    <tr>
+                        <th colspan="2" style="background: #3b82f6; color: white;">IP Address: {target_url}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Reputation Score</td><td><strong>{reputation_score}/7</strong></td></tr>
+                    <tr><td>Reputation Level</td><td>{self.__get_reputation_level(reputation_score)}</td></tr>
+                    <tr><td>Threat Pulses</td><td>{pulse_count}</td></tr>
+                    <tr><td>Country</td><td>{country}</td></tr>
+                    <tr><td>City</td><td>{city}</td></tr>
+                    <tr><td>Continent</td><td>{continent}</td></tr>
+                    <tr><td>Latitude</td><td>{latitude}</td></tr>
+                    <tr><td>Longitude</td><td>{longitude}</td></tr>
+                    <tr><td>ASN</td><td>{asn}</td></tr>
+                    <tr><td>Malware Samples</td><td>{malware_count}</td></tr>
+                    <tr><td>Associated URLs</td><td>{url_count}</td></tr>
+                    <tr><td>Passive DNS Records</td><td>{dns_count}</td></tr>
+                </tbody>
+            </table>
+            """
             
             # Create detailed pulse information table
-            html2 = ""
+            html_pulses = ""
             pulses = general_info.get('pulse_info', {}).get('pulses', [])
             if pulses:
-                pulse_data = []
-                for pulse in pulses[:10]:  # Limit to top 10 pulses
-                    pulse_data.append({
-                        'Pulse Name': pulse.get('name', 'Unknown'),
-                        'Tags': ', '.join(pulse.get('tags', [])),
-                        'Created': pulse.get('created', 'Unknown'),
-                        'TLP': pulse.get('TLP', 'Unknown'),
-                        'Threat Score': pulse.get('threat_score', 0)
-                    })
+                html_pulses = """
+                <table style="margin-top: 15px;">
+                    <thead>
+                        <tr>
+                            <th>Pulse Name</th>
+                            <th>Tags</th>
+                            <th>Created</th>
+                            <th>TLP</th>
+                            <th>Threat Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                """
                 
-                if pulse_data:
-                    pulse_df = pd.DataFrame(pulse_data)
-                    # html2 = "<h4 style='margin: 20px 0 10px 0;'>Recent Threat Pulses (Top 10)</h4>" + pulse_df.to_html(render_links=True, escape=False, index=False)
-                    html2 = pulse_df.to_html(render_links=True, escape=False, index=False)
+                for pulse in pulses[:10]:  # Limit to top 10 pulses
+                    pulse_name = pulse.get('name', 'Unknown')
+                    tags = ', '.join(pulse.get('tags', []))
+                    created = pulse.get('created', 'Unknown')
+                    tlp = pulse.get('TLP', 'Unknown')
+                    threat_score = pulse.get('threat_score', 0)
+                    
+                    html_pulses += f"""
+                    <tr>
+                        <td>{pulse_name}</td>
+                        <td>{tags if tags else 'N/A'}</td>
+                        <td>{created}</td>
+                        <td>{tlp}</td>
+                        <td>{threat_score}</td>
+                    </tr>
+                    """
+                
+                html_pulses += "</tbody></table>"
             
-            htmlValue = html1 + html2
+            return html_main + html_pulses
             
         except Exception as ex:
             error_msg = str(ex.args[0]) if ex.args else str(ex)
             msg = "[-] " + "AlienVault OTX Engine Error: " + target_url + " Formatting Output Error, " + error_msg
             print(Fore.RED + Style.BRIGHT + msg + Fore.RESET + Style.RESET_ALL)
-            htmlValue = f"<p style='color:red;'>Error processing {target_url}: {error_msg}</p>"
-        return htmlValue
+            return self._format_error_html(target_url, error_msg)
 
     def __get_reputation_level(self, score):
         """Convert numeric reputation score to text level"""
@@ -129,6 +150,21 @@ class alienvault_otx():
             return "Low Risk"
         else:
             return "Clean"
+
+    def _format_error_html(self, ip, error_msg):
+        """Format error message as HTML"""
+        return f"""
+        <table>
+            <thead>
+                <tr>
+                    <th colspan="2" style="background: #ef4444; color: white;">Error for IP: {ip}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Error</td><td>{error_msg}</td></tr>
+            </tbody>
+        </table>
+        """
 
     async def generate_Report(self, target_url, isFile=False):
         config = Configuration()
@@ -151,8 +187,6 @@ class alienvault_otx():
                     ips = list(target_url.split(","))
                 
                 for ip in ips:
-                    # Get general information
-                    url = f"{config.ALIENVAULT_OTX_ENDPOINT_URL}{ip}/general"
                     tasks.append(asyncio.create_task(self.__fetch_otx_data(session, ip)))
                 
                 responses = await asyncio.gather(*tasks, return_exceptions=True)

@@ -71,6 +71,8 @@ class ipqualityscore:
                         html_content.append(self._format_error_html(ip, error_msg))
                         self.summary_list.append([f"Error: {error_msg}", "N/A"])
             
+            print(Fore.CYAN + Style.BRIGHT + "[+] Finished Processing 🎯 IPQualityScore" + Fore.RESET)
+            
             return "".join(html_content)
             
         except Exception as ex:

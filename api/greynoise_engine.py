@@ -1,10 +1,7 @@
 import asyncio
 import aiohttp
-import pandas as pd
 from colorama import Fore, Style
 from utils.config_util import Configuration
-from utils.html_util import HTML_util
-
 
 class greynoise():
     def __init__(self):
@@ -26,7 +23,7 @@ class greynoise():
                 print(Fore.RED + Style.BRIGHT + msg + Fore.RESET + Style.RESET_ALL)
                 continue
 
-        print(Fore.CYAN + Style.BRIGHT + "[+] Finished Processing GreyNoise" + Fore.RESET)
+        print(Fore.CYAN + Style.BRIGHT + "[+] Finished Processing 📡 GreyNoise" + Fore.RESET)
 
     async def __formating_Output(self, decodedResponse, target_url):
         try:

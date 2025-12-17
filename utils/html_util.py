@@ -17,7 +17,9 @@ class HTML_util:
 
     async def outputHTML(self, timestamp):
         config = Configuration()
+        tool_name = config.TOOL_NAME
         company_name = config.COMPANY_NAME
+        company_slogan = config.COMPANY_SLOGAN
         report_title  = config.REPORT_TITLE
         report_sub_title = config.REPORT_SUB_TITLE
         
@@ -26,7 +28,7 @@ class HTML_util:
         <head>
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>{company_name} - IP Reputation Report</title>
+            <title>{tool_name} - IP Reputation Report</title>
             <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
             <style>
                 * {{
@@ -214,6 +216,16 @@ class HTML_util:
                     content: '🎯';
                 }}
                 
+                /* Criminal Ip - Dark Blue */
+                .section-header.criminalip {{
+                    background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+                    border-radius: 8px;
+                }}
+                
+                .section-header.criminalip::before {{
+                    content: '🔍';
+                }}
+
                 /* Cisco Talos - Dark Blue */
                 .section-header.ciscotalos {{
                     background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
@@ -451,7 +463,7 @@ class HTML_util:
                 <div class="header">
                     <div class="header-content">
                         <div class="company-logo">{company_name}</div>
-                        <div class="company-tagline">🔐 Security Intelligence & Threat Analysis Platform</div>
+                        <div class="company-tagline">{company_slogan}</div>
                         <div class="report-title">{report_title}</div>
                         <div class="report-subtitle">{report_sub_title}</div>
                     </div>
@@ -472,10 +484,10 @@ class HTML_util:
                         <div class="footer-left">
                             <span>© {config.YEAR} {company_name}</span>
                             <span>•</span>
-                            <span>All Rights Reserved</span>
+                            <span>{config.REPORT_COPY_RIGHT}</span>
                         </div>
                         <div class="footer-right">
-                            Developed by {config.AUTHOR} | Version {config.VERSION}
+                            {config.FOOTER_OWNER} {config.AUTHOR} | Version {config.VERSION}
                         </div>
                     </div>
                 </div>
@@ -607,6 +619,8 @@ class HTML_util:
                                 sectionType = 'greynoise';
                             }} else if (sectionTitle.includes('IPQualityScore')) {{
                                 sectionType = 'ipqualityscore';
+                            }} else if (sectionTitle.includes('CriminalIP')) {{
+                                sectionType = 'criminalip';
                             }} else if (sectionTitle.includes('Cisco Talos')) {{
                                 sectionType = 'ciscotalos';
                             }} else {{

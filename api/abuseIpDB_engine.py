@@ -1,12 +1,7 @@
 import asyncio
 import aiohttp
-import numpy as np
-import pandas as pd
 from colorama import Fore, Style
-
 from utils.config_util import Configuration
-from utils.html_util import HTML_util
-
 
 class abuseIPDB():
     abs_lst = []
@@ -33,7 +28,7 @@ class abuseIPDB():
                 print(Fore.RED + Style.BRIGHT + msg + Fore.RESET + Style.RESET_ALL)
                 continue
 
-        print(Fore.CYAN + Style.BRIGHT + f"[+] Finished Processing AbuseIPDB" + Fore.RESET)
+        print(Fore.CYAN + Style.BRIGHT + f"[+] Finished Processing ⚠️ AbuseIPDB" + Fore.RESET)
 
     async def __formating_Output(self, decodedResponse, target_url):
         try:

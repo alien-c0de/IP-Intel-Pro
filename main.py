@@ -57,7 +57,7 @@ async def Main() -> None:
     github = config.GITHUB
     version = config.VERSION
     print(Fore.BLUE + Style.BRIGHT + f"[✓] Analysis completed Total Time Taken: {round(perf_counter() - start_time, 2)} Seconds \n", flush=True)
-    print(Fore.YELLOW + f"📢 {footer_owner} 👽: {author} Ver: {version} © {year}", flush=True)
+    print(Fore.YELLOW + f"📢 {footer_owner} {author} Ver: {version} © {year}", flush=True)
     print(Fore.YELLOW + f"📧 {email} ", flush=True)
     print(Fore.YELLOW + f"🚀 {github}", flush=True)
     print(Style.RESET_ALL)

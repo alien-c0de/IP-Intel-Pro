@@ -20,85 +20,101 @@ class CSV_util:
             otx_lst = args[6] if len(args) > 6 else []
             gn_lst = args[7] if len(args) > 7 else []
             ipqs_lst = args[8] if len(args) > 8 else []
-            # talos_lst = args[9] if len(args) > 9 else []
+            crip_lst = args[9] if len(args) > 9 else []
             
             file_name = "Final_Summary"
 
+            # Get IP list
             ips = []            
             if isFile:
                 with open(target_url, "r") as url_file:
                     for url in url_file.readlines():
                         ips.append(url.strip())
-                    ips = list(ips)
             else:
-                ips = list(target_url.split(",")) 
-
+                ips = list(target_url.split(","))
+            
+            num_ips = len(ips)
             ips_dt = pd.DataFrame(ips, columns=['IP Address'])
 
+            # Helper function to normalize data lists
+            def normalize_list(data_list, num_ips, columns, default_values):
+                """Normalize data list to match number of IPs, handling errors"""
+                if not data_list or len(data_list) == 0:
+                    # No data at all - fill with N/A
+                    return pd.DataFrame([[default_val for default_val in default_values]] * num_ips, columns=columns)
+                
+                # Check if first element indicates an error for all IPs
+                first_elem = str(data_list[0]) if data_list else ""
+                if len(data_list) == 1 and ('Error' in first_elem or 'error' in first_elem.lower()):
+                    # Single error applies to all IPs
+                    return pd.DataFrame([[first_elem] + ['N/A'] * (len(columns) - 1)] * num_ips, columns=columns)
+                
+                # Data list has mixed or all successful results
+                normalized_data = []
+                for i in range(num_ips):
+                    if i < len(data_list):
+                        row_data = data_list[i]
+                        # Check if this specific row is an error
+                        if isinstance(row_data, list):
+                            # Check if any element in the list indicates an error
+                            row_str = str(row_data)
+                            if 'Error' in row_str or 'error' in row_str.lower():
+                                # This row has an error - keep it as is
+                                # Pad with N/A if needed
+                                while len(row_data) < len(columns):
+                                    row_data.append('N/A')
+                                normalized_data.append(row_data[:len(columns)])
+                            else:
+                                # Normal data row
+                                while len(row_data) < len(columns):
+                                    row_data.append('N/A')
+                                normalized_data.append(row_data[:len(columns)])
+                        else:
+                            # Single value
+                            normalized_data.append([row_data] + ['N/A'] * (len(columns) - 1))
+                    else:
+                        # Missing data for this IP - fill with default
+                        normalized_data.append(list(default_values))
+                
+                return pd.DataFrame(normalized_data, columns=columns)
+
             # VirusTotal
-            vt_err_code = str(vt_lst[0]) if vt_lst else ""
-            if 'Quota exceeded' in vt_err_code or 'Error' in vt_err_code:
-                vt_dt = pd.DataFrame(vt_lst[0], columns=['VirusTotal Error'])
-            else: 
-                vt_dt = pd.DataFrame(vt_lst, columns=['VirusTotal Malicious Score']) 
+            vt_dt = normalize_list(vt_lst, num_ips, 
+                                   ['VirusTotal Malicious Score', 'VirusTotal Suspicious Score'], 
+                                   ['N/A', 'N/A'])
 
             # AbuseIPDB
-            abs_err_code = str(abs_lst[0]) if abs_lst else ""
-            if '429' in abs_err_code or 'Error' in abs_err_code:
-                abs_dt = pd.DataFrame(abs_lst[0], columns=['AbuseIPDB Error'])
-            else: 
-                abs_dt = pd.DataFrame(abs_lst, columns=['AbuseIPDB Confidence Score']) 
+            abs_dt = normalize_list(abs_lst, num_ips, 
+                                    ['AbuseIPDB Confidence Score'], 
+                                    ['N/A'])
 
             # MetaDefender
-            meta_err_code = str(meta_lst[0]) if meta_lst else ""
-            if '429000' in meta_err_code or 'Error' in meta_err_code:
-                meta_dt = pd.DataFrame(meta_lst[0], columns=['MetaDefender Error'])
-            else: 
-                meta_dt = pd.DataFrame(meta_lst, columns=['MetaDefender Score', 'Geo Info']) 
+            meta_dt = normalize_list(meta_lst, num_ips, 
+                                     ['MetaDefender Score', 'Geo Info'], 
+                                     ['N/A', 'N/A'])
 
             # AlienVault OTX
-            if otx_lst:
-                otx_err_code = str(otx_lst[0]) if otx_lst else ""
-                if 'Error' in otx_err_code:
-                    otx_dt = pd.DataFrame(otx_lst[0], columns=['AlienVault OTX Error'])
-                else:
-                    otx_dt = pd.DataFrame(otx_lst, columns=['AlienVault Reputation Score'])
-            else:
-                otx_dt = pd.DataFrame([['N/A']] * len(ips), columns=['AlienVault Reputation Score'])
+            otx_dt = normalize_list(otx_lst, num_ips, 
+                                    ['AlienVault Reputation Score'], 
+                                    ['N/A'])
 
             # GreyNoise
-            if gn_lst:
-                gn_err_code = str(gn_lst[0]) if gn_lst else ""
-                if 'Error' in gn_err_code:
-                    gn_dt = pd.DataFrame(gn_lst[0], columns=['GreyNoise Error'])
-                else:
-                    gn_dt = pd.DataFrame(gn_lst, columns=['GN Classification', 'GN Service Name'])
-            else:
-                gn_dt = pd.DataFrame([['N/A', 'N/A']] * len(ips), columns=['GN Classification', 'GN Service Name'])
+            gn_dt = normalize_list(gn_lst, num_ips, 
+                                   ['GN Classification', 'GN Service Name'], 
+                                   ['N/A', 'N/A'])
 
             # IPQualityScore
-            if ipqs_lst:
-                ipqs_err_code = str(ipqs_lst[0]) if ipqs_lst else ""
-                if 'Error' in ipqs_err_code:
-                    ipqs_dt = pd.DataFrame(ipqs_lst[0], columns=['IPQualityScore Error'])
-                else:
-                    ipqs_dt = pd.DataFrame(ipqs_lst, columns=['IPQS Fraud Score', 'IPQS ISP'])
-            else:
-                ipqs_dt = pd.DataFrame([['N/A', 'N/A']] * len(ips), columns=['IPQS Fraud Score', 'IPQS ISP'])
+            ipqs_dt = normalize_list(ipqs_lst, num_ips, 
+                                     ['IPQS Fraud Score', 'IPQS ISP'], 
+                                     ['N/A', 'N/A'])
 
-            # # Cisco Talos
-            # if talos_lst:
-            #     talos_err_code = str(talos_lst[0]) if talos_lst else ""
-            #     if 'Error' in talos_err_code:
-            #         talos_dt = pd.DataFrame(talos_lst[0], columns=['Cisco Talos Error'])
-            #     else:
-            #         talos_dt = pd.DataFrame(talos_lst, columns=['Talos Reputation', 'Talos Category'])
-            # else:
-            #     talos_dt = pd.DataFrame([['N/A', 'N/A']] * len(ips), columns=['Talos Reputation', 'Talos Category'])
+            # Cisco Talos
+            crip_dt = normalize_list(crip_lst, num_ips, 
+                                      ['CriminalIP Inbound Score', 'CriminalIP Outbound Score'], 
+                                      ['N/A', 'N/A'])
 
             # Combine all dataframes
-            # final_df = pd.concat([ips_dt, vt_dt, abs_dt, meta_dt, otx_dt, gn_dt, ipqs_dt, talos_dt], axis=1)
-            final_df = pd.concat([ips_dt, vt_dt, abs_dt, meta_dt, otx_dt, gn_dt, ipqs_dt], axis=1)
+            final_df = pd.concat([ips_dt, vt_dt, abs_dt, meta_dt, otx_dt, gn_dt, ipqs_dt, crip_dt], axis=1)
 
             # Create filename
             file_name_csv = "%s_%s.csv" % (file_name, timestamp.strftime("%d%b%Y_%H-%M-%S"))

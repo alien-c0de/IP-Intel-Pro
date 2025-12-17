@@ -4,13 +4,8 @@ import base64
 import hashlib
 import re
 import time
-
-import pandas as pd
 from colorama import Fore, Style
-
 from utils.config_util import Configuration
-from utils.html_util import HTML_util
-
 
 class virus_total():
     def __init__(self, islist=False):
@@ -57,7 +52,7 @@ class virus_total():
                 print(Fore.RED + Style.BRIGHT + msg + Fore.RESET + Style.RESET_ALL)
                 continue
 
-        print(Fore.CYAN + Style.BRIGHT + "[+] Finished Processing VirusTotal" + Fore.RESET)
+        print(Fore.CYAN + Style.BRIGHT + "[+] Finished Processing 🛡️ VirusTotal" + Fore.RESET)
 
     async def __formating_Output(self, decodedResponse, target_url):
         try:
@@ -86,7 +81,7 @@ class virus_total():
             else:
                 malicious = harmless = suspicious = undetected = timeout = 0
             
-            self.vt_lst.append([malicious])
+            self.vt_lst.append([malicious, suspicious])
             
             total_vt_reviewers = harmless + malicious + suspicious + undetected + timeout
             

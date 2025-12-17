@@ -12,15 +12,19 @@ class Configuration:
      VERSION = config['General']['VERSION']
      AUTHOR = config['General']['AUTHOR']
      YEAR = config['General']['YEAR']
-     COMPANY_NAME = config['General']['COMPANY_NAME']
-     TOOL_NAME = config['General']['TOOL_NAME']
      EMAIL = config['General']['EMAIL']
      GITHUB = config['General']['GITHUB']
-     FOOTER_OWNER = config['General']['FOOTER_OWNER']
-     REPORT_TITLE = config['General']['REPORT_TITLE']
-     REPORT_SUB_TITLE = config['General']['REPORT_SUB_TITLE']
-     REPORT_FILE_NAME = config['General']['REPORT_FILE_NAME']
      WKHTMLTOPDF = config['General']['WKHTMLTOPDF']
+
+     'Report Details' in config
+     TOOL_NAME = config['Report Details']['TOOL_NAME']
+     COMPANY_NAME = config['Report Details']['COMPANY_NAME']
+     COMPANY_SLOGAN = config['Report Details']['COMPANY_SLOGAN']
+     REPORT_TITLE = config['Report Details']['REPORT_TITLE']
+     REPORT_SUB_TITLE = config['Report Details']['REPORT_SUB_TITLE']
+     REPORT_FILE_NAME = config['Report Details']['REPORT_FILE_NAME']
+     FOOTER_OWNER = config['Report Details']['FOOTER_OWNER']
+     REPORT_COPY_RIGHT = config['Report Details']['REPORT_COPY_RIGHT']
 
      'VirusTotal' in config
      VIRUS_TOTAL_API_KEY = config['VirusTotal']['API_KEY']   

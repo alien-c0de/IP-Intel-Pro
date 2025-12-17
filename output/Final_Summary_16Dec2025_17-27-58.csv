@@ -1,3 +1,0 @@
-IP Address,VirusTotal Malicious Score,AbuseIPDB Confidence Score,MetaDefender Error,AlienVault Reputation Score,GN Classification,GN Service Name,IPQS Fraud Score,IPQS ISP
-172.16.0.1,0,0,Error Code : 400185 The address is a not routable IP,0,Not seen,Unknown,100,Private IP Address
-35.230.66.101,6,0,,0,Not seen,Unknown,0,Google

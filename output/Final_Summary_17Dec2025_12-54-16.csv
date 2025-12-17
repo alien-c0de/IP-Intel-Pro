@@ -1,0 +1,2 @@
+IP Address,VirusTotal Malicious Score,VirusTotal Suspicious Score,AbuseIPDB Confidence Score,MetaDefender Score,Geo Info,AlienVault Reputation Score,GN Classification,GN Service Name,IPQS Fraud Score,IPQS ISP,CriminalIP Inbound Score,CriminalIP Outbound Score
+8.8.8.8,0,0,0,0,"Country: United States, City: Mountain View, Location: 37.38802, -122.07431",0,Not seen,Unknown,0,Google,Safe,Safe
