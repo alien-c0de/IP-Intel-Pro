@@ -157,37 +157,30 @@ Edit the `config/config.ini` file with your API keys:
 API_KEY = Your_API_Key
 ENDPOINT_URL = https://www.virustotal.com/api/v3/urls/
 REPORT_LINK = https://www.virustotal.com/gui/url/
-FILE_NAME = virus_total_report
 
 [MetaDefender]
 API_KEY = Your_API_Key
 ENDPOINT_URL = https://api.metadefender.com/v4/ip/
-FILE_NAME = metadefender_report
 
 [AbuseIPDB]
 API_KEY = Your_API_Key
 ENDPOINT_URL = https://api.abuseipdb.com/api/v2/check
-FILE_NAME = abuseIpDB_report
 
 [AlienVault_OTX]
 API_KEY = Your_API_Key
 ENDPOINT_URL = https://otx.alienvault.com/api/v1/indicators/IPv4/
-FILE_NAME = alienvault_otx_report
 
 [GreyNoise]
 API_KEY = Your_API_Key
 ENDPOINT_URL = https://api.greynoise.io/v3/community/
-FILE_NAME = greynoise_report
 
 [IPQualityScore]
 API_KEY = Your_API_Key
 ENDPOINT_URL = https://ipqualityscore.com/api/json/ip/
-FILE_NAME = ipqualityscore_report
 
 [CriminalIP]
 API_KEY = Your_API_Key
 ENDPOINT_URL = https://api.criminalip.io/v1/asset/ip/report?ip=
-FILE_NAME = criminalIP_report
 ```
 
 ### Step 2: Customize Company Branding (Optional)
@@ -303,7 +296,23 @@ Each consolidated report includes:
    - Abuse confidence score
    - ISP and hosting information
    - Report history and statistics
-6. **Footer**: Tool version and developer information
+6. **IPQualityScore Analysis**:
+   - Fraud score and risk rating
+   - VPN, Proxy, and Tor node detection
+   - Bot status and connection type
+7. **GreyNoise Analysis**:
+   - Noise classification (Internet background noise)
+   - RIOT (Common Business Service) verification
+   - Actor and tag identification
+8. **CriminalIP Analysis**:
+   - Inbound and Outbound risk scores
+   - Associated vulnerabilities (CVEs)
+   - Domain and certificate reputation
+9. **AlienVault OTX Analysis**:
+   - Pulse count and community subscribers
+   - Related malware families and tags
+   - Linked indicators of compromise
+10. **Footer**: Tool version and developer information
 
 ---
 
