@@ -86,12 +86,12 @@ You'll need free API keys from:
 ## 📸 Screenshots
 
 ### Terminal Input
-![Terminal Input](https://github.com/user-attachments/assets/44bf5af3-13aa-4b29-9636-fc3d5010bc3a)
+![IpIntelPro](https://github.com/user-attachments/assets/c2d59121-9926-4fe4-a03b-0d24118219d8)
 
 *Command-line interface showing the analysis in progress*
 
 ### HTML Report
-![Summary Report Dashboard](https://github.com/user-attachments/assets/2d1b28cb-9294-472c-9363-5ea33406d3cd)
+![Ip Report](https://github.com/user-attachments/assets/62bd8bc8-b1ed-451a-b9b0-780e1bfc74f7)
 
 *Professional report*
 
