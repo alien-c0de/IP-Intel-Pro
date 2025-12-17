@@ -15,12 +15,12 @@
 - [Features](#-features)
 - [Supported Reputation Engines](#-supported-reputation-engines)
 - [Prerequisites](#-prerequisites)
+- [Screenshots](#-screenshots)
 - [Installation](#-installation)
 - [Configuration](#-configuration)
 - [Usage](#-usage)
 - [Output](#-output)
 - [Report Features](#-report-features)
-- [Project Structure](#-project-structure)
 - [Troubleshooting](#-troubleshooting)
 - [License](#-license)
 - [Author](#-author)
@@ -50,11 +50,12 @@ IP Intel Pro integrates with the following threat intelligence platforms:
 | **VirusTotal** | [virustotal.com](https://www.virustotal.com) | Comprehensive threat detection using 90+ security vendors |
 | **MetaDefender** | [metadefender.opswat.com](https://metadefender.opswat.com) | Multi-scanning with geo-location intelligence |
 | **AbuseIPDB** | [abuseipdb.com](https://www.abuseipdb.com) | Community-driven IP abuse reporting database |
+| **AbuseIPDB** | [abuseipdb.com](https://www.abuseipdb.com) | Community-driven IP abuse reporting database |
+| **IPQualityScore** | [ipqualityscore.com](https://www.ipqualityscore.com) | Enterprise-grade fraud protection and IP risk scoring |
+| **GreyNoise** | [greynoise.io](https://www.greynoise.io) | Internet background noise analysis and scanner detection |
+| **CriminalIP** | [criminalip.io](https://www.criminalip.io) | AI-based Cyber Threat Intelligence (CTI) search engine |
+| **AlienVault OTX** | [otx.alienvault.com](https://otx.alienvault.com) | The world's largest open threat intelligence community |
 
-Each engine provides unique insights:
-- **VirusTotal**: Community scores, vendor-specific detections, historical analysis
-- **MetaDefender**: Sandbox analysis, offline reputation, geo-location data
-- **AbuseIPDB**: Abuse confidence scores, ISP information, report history
 
 ---
 
@@ -75,6 +76,24 @@ You'll need free API keys from:
 1. **VirusTotal**: [Sign up here](https://www.virustotal.com/gui/join-us)
 2. **MetaDefender**: [Get API key](https://metadefender.opswat.com/sign-up)
 3. **AbuseIPDB**: [Register here](https://www.abuseipdb.com/register)
+4. **IPQualityScore**: [Create account](https://www.ipqualityscore.com/create-account)
+5. **GreyNoise**: [Get Community API](https://viz.greynoise.io/signup)
+6. **CriminalIP**: [Sign up here](https://www.criminalip.io/register)
+7. **AlienVault OTX**: [Register here](https://otx.alienvault.com/sign-up)
+
+---
+
+## 📸 Screenshots
+
+### Terminal Input
+![Terminal Input](https://github.com/user-attachments/assets/44bf5af3-13aa-4b29-9636-fc3d5010bc3a)
+
+*Command-line interface showing the analysis in progress*
+
+### HTML Report
+![Summary Report Dashboard](https://github.com/user-attachments/assets/2d1b28cb-9294-472c-9363-5ea33406d3cd)
+
+*Professional report*
 
 ---
 
@@ -133,33 +152,42 @@ brew install wkhtmltopdf
 Edit the `config/config.ini` file with your API keys:
 
 ```ini
-[General]
-VERSION = 1.1.0
-AUTHOR = Your Name
-YEAR = 2025
-COMPANY_NAME = Your Company Name
 
 [VirusTotal]
-API_KEY = your_virustotal_api_key_here
+API_KEY = Your_API_Key
 ENDPOINT_URL = https://www.virustotal.com/api/v3/urls/
 REPORT_LINK = https://www.virustotal.com/gui/url/
 FILE_NAME = virus_total_report
-REPORT_TITLE = VirusTotal Analysis Report
-REPORT_SUB_TITLE = VirusTotal API v3
 
 [MetaDefender]
-API_KEY = your_metadefender_api_key_here
+API_KEY = Your_API_Key
 ENDPOINT_URL = https://api.metadefender.com/v4/ip/
 FILE_NAME = metadefender_report
-REPORT_TITLE = MetaDefender Analysis Report
-REPORT_SUB_TITLE = MetaDefender API
 
 [AbuseIPDB]
-API_KEY = your_abuseipdb_api_key_here
+API_KEY = Your_API_Key
 ENDPOINT_URL = https://api.abuseipdb.com/api/v2/check
 FILE_NAME = abuseIpDB_report
-REPORT_TITLE = AbuseIPDB Analysis Report
-REPORT_SUB_TITLE = AbuseIPDB API v2
+
+[AlienVault_OTX]
+API_KEY = Your_API_Key
+ENDPOINT_URL = https://otx.alienvault.com/api/v1/indicators/IPv4/
+FILE_NAME = alienvault_otx_report
+
+[GreyNoise]
+API_KEY = Your_API_Key
+ENDPOINT_URL = https://api.greynoise.io/v3/community/
+FILE_NAME = greynoise_report
+
+[IPQualityScore]
+API_KEY = Your_API_Key
+ENDPOINT_URL = https://ipqualityscore.com/api/json/ip/
+FILE_NAME = ipqualityscore_report
+
+[CriminalIP]
+API_KEY = Your_API_Key
+ENDPOINT_URL = https://api.criminalip.io/v1/asset/ip/report?ip=
+FILE_NAME = criminalIP_report
 ```
 
 ### Step 2: Customize Company Branding (Optional)
@@ -206,12 +234,10 @@ usage: main.py [-h] [-s SINGLE_ENTRY] [-i IP_LIST] [-V]
 IP Intel Pro: Comprehensive IP Reputation Analysis
 
 optional arguments:
-  -h, --help            Show this help message and exit
-  -s SINGLE_ENTRY, --single-entry SINGLE_ENTRY
-                        Single IP address for analysis
-  -i IP_LIST, --ip-list IP_LIST
-                        File containing list of IP addresses (one per line)
-  -V, --version         Show program version
+  -h, --help               Show this help message and exit
+  -s SINGLE_ENTRY,         Single IP address for analysis
+  -i IP_LIST, --ip-list    IP_LIST File containing list of IP addresses (one per line)
+  -V, --version            Show program version
 ```
 
 ---
@@ -281,34 +307,6 @@ Each consolidated report includes:
 
 ---
 
-## 📁 Project Structure
-
-```
-ip-intel-pro/
-│
-├── api/
-│   ├── engine.py                    # Main orchestration engine
-│   ├── virus_total_engine.py        # VirusTotal API integration
-│   ├── metadefender_engine.py       # MetaDefender API integration
-│   └── abuseIpDB_engine.py          # AbuseIPDB API integration
-│
-├── config/
-│   └── config.ini                   # Configuration file (API keys)
-│
-├── utils/
-│   ├── config_util.py               # Configuration loader
-│   ├── csv_util.py                  # CSV generation utility
-│   └── html_util.py                 # HTML/PDF report generator
-│
-├── output/                          # Generated reports (auto-created)
-│
-├── main.py                          # Main entry point
-├── requirements.txt                 # Python dependencies
-└── README.md                        # This file
-```
-
----
-
 ## 🔧 Troubleshooting
 
 ### Common Issues and Solutions
@@ -361,84 +359,19 @@ pip install -r requirements.txt --upgrade
 
 ---
 
-## 📦 Dependencies
-
-IP Intel Pro requires the following Python packages:
-
-```
-aiohttp>=3.9.0
-pandas>=2.0.0
-pdfkit>=1.0.0
-colorama>=0.4.6
-asyncio>=3.4.3
-```
-
-Install all dependencies:
-```bash
-pip install -r requirements.txt
-```
-
----
-
-## 🔐 Security Considerations
-
-- **API Keys**: Never commit `config.ini` with real API keys to version control
-- **Data Privacy**: IP addresses analyzed may be logged by third-party services
-- **Rate Limits**: Respect API rate limits to avoid account suspension
-- **Local Storage**: Reports contain sensitive threat intelligence data - store securely
-
-### Best Practices
-
-1. Add `config/config.ini` to `.gitignore`
-2. Use environment variables for API keys in production
-3. Regularly rotate API keys
-4. Review API provider terms of service
-5. Implement access controls on output directory
-
----
-
 ## 🗺️ Roadmap
 
 Future enhancements planned:
 
-- [ ] Additional reputation engines (Shodan, IPVoid, etc.)
+- [ ] Additional reputation engines 
 - [ ] Web interface for easier access
-- [ ] Historical tracking and comparison
-- [ ] Custom alert thresholds
-- [ ] Integration with SIEM platforms
-- [ ] API endpoint for programmatic access
-- [ ] Docker containerization
 - [ ] Scheduled scanning jobs
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-```
-MIT License
-
-Copyright (c) 2025 Alien C00de
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
+This project is licensed under the MIT License.
 
 ---
 
@@ -454,9 +387,13 @@ SOFTWARE.
 
 ## 🙏 Acknowledgments
 
-- [VirusTotal](https://www.virustotal.com) for comprehensive threat intelligence
-- [MetaDefender](https://metadefender.opswat.com) for multi-engine scanning capabilities
-- [AbuseIPDB](https://www.abuseipdb.com) for community-driven abuse reporting
+- [VirusTotal](https://www.virustotal.com) 
+- [MetaDefender](https://metadefender.opswat.com) 
+- [AbuseIPDB](https://www.abuseipdb.com) 
+- [IPQualityScore](https://www.ipqualityscore.com/create-account)
+- [GreyNoise](https://viz.greynoise.io/signup)
+- [CriminalIP](https://www.criminalip.io/register)
+- [AlienVault OTX](https://otx.alienvault.com/sign-up)
 - All contributors and users of IP Intel Pro
 
 ---
