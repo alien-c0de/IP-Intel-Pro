@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IP Intel Pro - Advanced IP Intelligence & Threat Analysis</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0a0e1a 0%, #1a1f35 100%);
+            color: #e4e6eb;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeInDown 0.8s ease;
+        }
+        
+        .logo {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+        
+        h1 {
+            color: #00ff88;
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+        
+        .version {
+            display: inline-block;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            color: #00ff88;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
+        
+        .tagline {
+            color: #a8aab7;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        
+        .stat {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px 30px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 255, 136, 0.2);
+        }
+        
+        .stat-number {
+            color: #00ff88;
+            font-size: 2em;
+            font-weight: 700;
+        }
+        
+        .stat-label {
+            color: #a8aab7;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        .card {
+            background: linear-gradient(135deg, #1a1f35 0%, #0f1420 100%);
+            border: 1px solid #2d3548;
+            border-radius: 16px;
+            padding: 40px;
+            margin: 30px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            animation: fadeInUp 0.8s ease;
+        }
+        
+        .card h2 {
+            color: #00d4ff;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .feature {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 3px solid #00ff88;
+        }
+        
+        .feature h3 {
+            color: #00ff88;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        
+        .feature p {
+            color: #a8aab7;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+        
+        .engines {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .engine {
+            background: rgba(0, 212, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .engine:hover {
+            background: rgba(0, 212, 255, 0.1);
+            transform: translateY(-3px);
+        }
+        
+        .engine-name {
+            color: #00d4ff;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .engine-desc {
+            color: #a8aab7;
+            font-size: 0.85em;
+        }
+        
+        .btn-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 15px 35px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #00ff88, #00d4ff);
+            color: #000;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 255, 136, 0.4);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #00d4ff;
+            color: #00d4ff;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(0, 212, 255, 0.1);
+            transform: translateY(-3px);
+        }
+        
+        .report-list {
+            list-style: none;
+        }
+        
+        .report-item {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 3px solid #00ff88;
+            transition: all 0.3s ease;
+        }
+        
+        .report-item:hover {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateX(10px);
+        }
+        
+        .report-item h3 {
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+        
+        .report-item p {
+            color: #a8aab7;
+            margin-bottom: 15px;
+        }
+        
+        .report-link {
+            color: #00ff88;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .report-link:hover {
+            text-decoration: underline;
+        }
+        
+        .threat-indicators {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .threat-badge {
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .threat-malicious {
+            background: rgba(255, 71, 87, 0.1);
+            border: 1px solid rgba(255, 71, 87, 0.3);
+            color: #ff4757;
+        }
+        
+        .threat-suspicious {
+            background: rgba(255, 170, 0, 0.1);
+            border: 1px solid rgba(255, 170, 0, 0.3);
+            color: #ffaa00;
+        }
+        
+        .threat-clean {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            color: #00ff88;
+        }
+        
+        .threat-unknown {
+            background: rgba(168, 170, 183, 0.1);
+            border: 1px solid rgba(168, 170, 183, 0.3);
+            color: #a8aab7;
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .card {
+                padding: 25px;
+            }
+            
+            .btn-container {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">🔐</div>
+            <h1>IP Intel Pro</h1>
+            <div class="version">V2.0</div>
+            <p class="tagline">Advanced IP Intelligence & Threat Analysis</p>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-number">7</div>
+                <div class="stat-label">Threat Intelligence Engines</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Open Source</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number">3</div>
+                <div class="stat-label">Report Formats</div>
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <a href="https://github.com/alien-c0de/ip-intel-pro" class="btn btn-primary">
+                ⭐ View on GitHub
+            </a>
+            <a href="https://github.com/alien-c0de/ip-intel-pro/tree/main/output" class="btn btn-secondary">
+                📊 Sample Reports
+            </a>
+        </div>
+
+        <div class="card">
+            <h2>🔍 What IP Intel Pro Does</h2>
+            <p style="color: #a8aab7; margin-bottom: 25px;">
+                IP Intel Pro is a comprehensive IP reputation analysis tool that aggregates threat intelligence data from multiple trusted sources to provide detailed security assessments of IP addresses.
+            </p>
+            <div class="features">
+                <div class="feature">
+                    <h3>Multi-Source Intelligence</h3>
+                    <p>Queries 7 leading threat intelligence platforms simultaneously</p>
+                </div>
+                <div class="feature">
+                    <h3>Professional Reports</h3>
+                    <p>Generates HTML, PDF, and CSV reports with modern design</p>
+                </div>
+                <div class="feature">
+                    <h3>Bulk Analysis</h3>
+                    <p>Support for single IP or bulk IP address scanning</p>
+                </div>
+                <div class="feature">
+                    <h3>Async Performance</h3>
+                    <p>Fast concurrent API calls for efficient processing</p>
+                </div>
+                <div class="feature">
+                    <h3>Color-Coded Results</h3>
+                    <p>Visual threat level indicators for quick assessment</p>
+                </div>
+                <div class="feature">
+                    <h3>Cross-Platform</h3>
+                    <p>Works on Windows, Linux, and macOS</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🌐 Integrated Threat Intelligence Engines</h2>
+            <div class="engines">
+                <div class="engine">
+                    <div class="engine-name">VirusTotal</div>
+                    <div class="engine-desc">90+ security vendors</div>
+                </div>
+                <div class="engine">
+                    <div class="engine-name">MetaDefender</div>
+                    <div class="engine-desc">Multi-scanning & geo-location</div>
+                </div>
+                <div class="engine">
+                    <div class="engine-name">AbuseIPDB</div>
+                    <div class="engine-desc">Community abuse reporting</div>
+                </div>
+                <div class="engine">
+                    <div class="engine-name">AlienVault OTX</div>
+                    <div class="engine-desc">Open threat intelligence</div>
+                </div>
+                <div class="engine">
+                    <div class="engine-name">GreyNoise</div>
+                    <div class="engine-desc">Internet noise analysis</div>
+                </div>
+                <div class="engine">
+                    <div class="engine-name">IPQualityScore</div>
+                    <div class="engine-desc">Fraud protection & risk scoring</div>
+                </div>
+                <div class="engine">
+                    <div class="engine-name">Cisco Talos</div>
+                    <div class="engine-desc">Threat intelligence platform</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🎨 Visual Threat Indicators</h2>
+            <p style="color: #a8aab7; margin-bottom: 20px;">
+                Reports use color-coded indicators for quick threat assessment:
+            </p>
+            <div class="threat-indicators">
+                <div class="threat-badge threat-malicious">
+                    🔴 MALICIOUS<br>
+                    <small style="opacity: 0.8;">Confirmed threats</small>
+                </div>
+                <div class="threat-badge threat-suspicious">
+                    🟠 SUSPICIOUS<br>
+                    <small style="opacity: 0.8;">Questionable activity</small>
+                </div>
+                <div class="threat-badge threat-clean">
+                    🟢 CLEAN<br>
+                    <small style="opacity: 0.8;">No threats detected</small>
+                </div>
+                <div class="threat-badge threat-unknown">
+                    ⚪ UNDETECTED<br>
+                    <small style="opacity: 0.8;">Not flagged</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📊 Sample Security Reports</h2>
+            <p style="color: #a8aab7; margin-bottom: 25px;">
+                Explore real IP intelligence reports generated by IP Intel Pro. These reports show comprehensive threat analysis from 7 intelligence sources.
+            </p>
+            <ul class="report-list">
+                <li class="report-item">
+                    <h3>🔒 Sample IP Reputation Analysis</h3>
+                    <p>Complete threat intelligence assessment including VirusTotal, MetaDefender, AbuseIPDB, AlienVault OTX, GreyNoise, IPQualityScore, and Cisco Talos analysis.</p>
+                    <p><strong>Report Includes:</strong></p>
+                    <ul style="color: #a8aab7; margin-left: 20px; margin-bottom: 15px;">
+                        <li>Multi-source threat scoring</li>
+                        <li>Geo-location and ISP information</li>
+                        <li>VPN/Proxy/Tor detection</li>
+                        <li>Abuse history and reputation</li>
+                        <li>Community intelligence</li>
+                    </ul>
+                    <a href="./reports/sample-ip-report.html" class="report-link" target="_blank">
+                        View Interactive Report →
+                    </a>
+                </li>
+            </ul>
+            <p style="color: #a8aab7; margin-top: 25px; text-align: center;">
+                💡 <strong>Note:</strong> Download sample reports from the <a href="https://github.com/alien-c0de/ip-intel-pro/tree/main/output" style="color: #00d4ff; text-decoration: none;">output folder</a> on GitHub to see the full analysis with all visualizations.
+            </p>
+        </div>
+
+        <div class="card">
+            <h2>🚀 Quick Start</h2>
+            <div style="background: rgba(0, 0, 0, 0.3); padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <code style="color: #00ff88; font-size: 0.95em; line-height: 1.8;">
+                    git clone https://github.com/alien-c0de/ip-intel-pro.git<br>
+                    cd ip-intel-pro<br>
+                    pip install -r requirements.txt<br>
+                    python main.py -s 8.8.8.8
+                </code>
+            </div>
+            <p style="color: #a8aab7; margin-top: 15px;">
+                <strong>Bulk Analysis:</strong> Create a text file with IP addresses (one per line) and run:
+            </p>
+            <div style="background: rgba(0, 0, 0, 0.3); padding: 15px; border-radius: 10px; margin: 15px 0;">
+                <code style="color: #00ff88; font-size: 0.95em;">
+                    python main.py -i ip_list.txt
+                </code>
+            </div>
+            <p style="color: #a8aab7; margin-top: 15px;">
+                The analysis generates HTML, PDF, and CSV reports with comprehensive threat intelligence data.
+            </p>
+        </div>
+
+        <div class="card">
+            <h2>📦 Output Reports</h2>
+            <p style="color: #a8aab7; line-height: 1.8; margin-bottom: 20px;">
+                IP Intel Pro generates three types of comprehensive reports:
+            </p>
+            <div class="features">
+                <div class="feature">
+                    <h3>HTML Report</h3>
+                    <p>Interactive, responsive report with color-coded threat levels and detailed analysis from all 7 engines</p>
+                </div>
+                <div class="feature">
+                    <h3>PDF Report</h3>
+                    <p>Print-ready professional document with same content as HTML for easy sharing and archiving</p>
+                </div>
+                <div class="feature">
+                    <h3>CSV Export</h3>
+                    <p>Tabular summary data with scores from all engines for further analysis and processing</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🎯 Perfect For</h2>
+            <div style="display: grid; gap: 15px; margin-top: 20px;">
+                <div style="background: rgba(255, 255, 255, 0.03); padding: 15px; border-radius: 10px;">
+                    <strong style="color: #00ff88;">🔐 Security Analysts:</strong>
+                    <span style="color: #a8aab7;"> Quick IP reputation checks during incident response and threat hunting</span>
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.03); padding: 15px; border-radius: 10px;">
+                    <strong style="color: #00ff88;">🌐 Network Administrators:</strong>
+                    <span style="color: #a8aab7;"> Monitor and assess traffic from suspicious IP addresses</span>
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.03); padding: 15px; border-radius: 10px;">
+                    <strong style="color: #00ff88;">🕵️ Fraud Prevention Teams:</strong>
+                    <span style="color: #a8aab7;"> Detect VPNs, proxies, and high-risk IP addresses</span>
+                </div>
+                <div style="background: rgba(255, 255, 255, 0.03); padding: 15px; border-radius: 10px;">
+                    <strong style="color: #00ff88;">🎓 Cybersecurity Researchers:</strong>
+                    <span style="color: #a8aab7;"> Aggregate threat intelligence from multiple sources for analysis</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>💡 Why IP Intel Pro?</h2>
+            <p style="color: #a8aab7; line-height: 1.8;">
+                Instead of manually checking multiple threat intelligence platforms, IP Intel Pro automates the entire process. Query 7 leading sources simultaneously, get consolidated reports with visual threat indicators, and export data in multiple formats—all from a single command.
+            </p>
+            <br>
+            <p style="color: #a8aab7; line-height: 1.8;">
+                Perfect for security professionals who need reliable, fast IP reputation analysis without the hassle of managing multiple API integrations and consolidating data manually.
+            </p>
+        </div>
+
+        <div style="text-align: center; margin-top: 50px; padding-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+            <p style="color: #a8aab7; margin-bottom: 10px;">
+                Built with ❤️ by <a href="https://github.com/alien-c0de" style="color: #00ff88; text-decoration: none;">Alien C00de</a>
+            </p>
+            <p style="color: #666;">
+                © 2025 IP Intel Pro. Open Source under MIT License.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
