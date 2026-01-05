@@ -6,7 +6,7 @@
 
 **IP Intel Pro** is a comprehensive IP reputation analysis tool that aggregates threat intelligence data from multiple trusted sources to provide detailed security assessments of IP addresses. Perfect for security analysts, network administrators, and cybersecurity professionals who need quick, reliable IP reputation checks.
 
-![🌐 Interactive Demo & Live Reports](https://alien-c0de.github.io/IP-Intel-Pro/)
+[🌐 Interactive Demo & Live Reports](https://alien-c0de.github.io/IP-Intel-Pro/)
 
 ---
 
