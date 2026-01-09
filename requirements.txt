@@ -8,13 +8,14 @@ requests==2.32.5
 # Data manipulation and analysis
 pandas==2.3.2
 numpy==2.3.2
-configparser=7.2.0
+configparser==7.2.0
 
 # PDF generation
 pdfkit==1.0.0
 
 # Terminal colors and styling
 colorama==0.4.6
-pyfiglet=1.0.3
+pyfiglet==1.0.3
 # Additional async support
 asyncio==4.0.0
+
